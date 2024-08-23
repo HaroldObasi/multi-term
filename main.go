@@ -9,19 +9,6 @@ import (
 	"github.com/mattn/go-runewidth"
 )
 
-type Window struct {
-	x int
-	y int
-}
-
-func (w *Window) Write(char rune, s tcell.Screen) {
-	// style := tcell.StyleDefault.Foreground(tcell.ColorCadetBlue.TrueColor()).Background(tcell.ColorWhite)
-	s.SetContent(w.x, w.y, char, nil, tcell.StyleDefault)
-
-	w.x++
-	s.Show()
-}
-
 func emitStr(s tcell.Screen, x, y int, style tcell.Style, str string) {
 	for _, c := range str {
 		var comb []rune
@@ -71,6 +58,7 @@ func main() {
 	s.ShowCursor(0, 0)
 
 	// displayHelloWorld(s)
+	w.CreateDebugArea(s)
 
 	for {
 		switch ev := s.PollEvent().(type) {
@@ -82,10 +70,14 @@ func main() {
 				s.Fini()
 				os.Exit(0)
 			}
-			if ev.Key() == tcell.KeyCtrlL {
-				w.Write('a', s)
-
-				// displayHelloWorld(s)
+			if ev.Key() == tcell.KeyEnter {
+				w.x = -1
+				w.y++
+			}
+			if ev.Key() == tcell.KeyBackspace || ev.Key() == tcell.KeyBackspace2 {
+				// w.x--
+				// w.Write('', s)
+				w.WriteDebug(s, "Backspace")
 			}
 			if ch := ev.Rune(); ch != 0 {
 				w.Write(ch, s)
