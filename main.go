@@ -36,8 +36,10 @@ func displayHelloWorld(s tcell.Screen) {
 func main() {
 
 	w := Window{
-		x: 0,
-		y: 0,
+		cursor: Cursor{
+			x: 0,
+			y: 0,
+		},
 	}
 
 	s, e := tcell.NewScreen()
@@ -66,22 +68,45 @@ func main() {
 			s.Sync()
 			// displayHelloWorld(s)
 		case *tcell.EventKey:
-			if ev.Key() == tcell.KeyEscape {
+			switch ev.Key() {
+
+			case tcell.KeyEscape:
 				s.Fini()
 				os.Exit(0)
-			}
-			if ev.Key() == tcell.KeyEnter {
-				w.x = -1
-				w.y++
-			}
-			if ev.Key() == tcell.KeyBackspace || ev.Key() == tcell.KeyBackspace2 {
-				// w.x--
-				// w.Write('', s)
-				w.WriteDebug(s, "Backspace")
-			}
-			if ch := ev.Rune(); ch != 0 {
+		
+			case tcell.KeyRune:
+				ch := ev.Rune()
 				w.Write(ch, s)
+				w.WriteDebug(s, ev.Name())
+
+			case tcell.KeyBackspace, tcell.KeyBackspace2:
+				w.Delete(s)
+				w.WriteDebug(s, "Backspace")
+
+			case tcell.KeyEnter:
+				w.cursor.SetPos(0, w.cursor.y+1, s)
+
 			}
+
+			// if ev.Key() == tcell.KeyEscape {
+			// 	s.Fini()
+			// 	os.Exit(0)
+			// }
+			// if ev.Key() == tcell.KeyEnter {
+			// 	w.x = -1
+			// 	w.y++
+			// }
+			// if ev.Key() == tcell.KeyBackspace || ev.Key() == tcell.KeyBackspace2 {
+			// 	// w.x--
+			// 	// w.Write('', s)
+			// 	// w.WriteDebug(s, "Backspace")
+			// 	// return
+
+			// }
+			// if ch := ev.Rune(); ch != 0 {
+			// 	w.Write(ch, s)
+			// 	w.WriteDebug(s, ev.Name())
+			// }
 
 		}
 	}
