@@ -2,18 +2,23 @@ package main
 
 import "github.com/gdamore/tcell/v2"
 
-type Window struct { 
-	x int
-	y int
+type Window struct {
+	cursor Cursor
 }
 
 func (w *Window) Write(char rune, s tcell.Screen) {
-	s.SetContent(w.x, w.y, char, nil, tcell.StyleDefault)
-	w.x++
+	s.SetContent(w.cursor.x, w.cursor.y, char, nil, tcell.StyleDefault)
+	w.cursor.SetPos(w.cursor.x+1, w.cursor.y, s)
 	s.Show()
 }
 
-func (w *Window) CreateDebugArea (s tcell.Screen){
+func (w *Window) Delete(s tcell.Screen){
+	w.cursor.SetPos(w.cursor.x-1, w.cursor.y, s)
+	s.SetContent(w.cursor.x, w.cursor.y, ' ', nil, tcell.StyleDefault)
+	s.Show()
+}
+
+func (w *Window) CreateDebugArea(s tcell.Screen) {
 	style := tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorWhite)
 	sWidth, sHeight := s.Size()
 
@@ -25,14 +30,14 @@ func (w *Window) CreateDebugArea (s tcell.Screen){
 	s.Show()
 }
 
-func (w *Window) WriteDebug(s tcell.Screen, str string){
+func (w *Window) WriteDebug(s tcell.Screen, str string) {
 	style := tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorWhite)
 	_, sHeight := s.Size()
 
 	startingPoint := 5
 
 	for i, char := range str {
-		s.SetContent(i, sHeight - startingPoint, char, nil, style)
+		s.SetContent(i, sHeight-startingPoint, char, nil, style)
 	}
 
 	s.Show()
