@@ -77,7 +77,6 @@ func main() {
 			case tcell.KeyRune:
 				ch := ev.Rune()
 				w.Write(ch, s)
-				w.WriteDebug(s, ev.Name())
 
 			case tcell.KeyBackspace, tcell.KeyBackspace2:
 				w.Delete(s)
@@ -85,29 +84,19 @@ func main() {
 
 			case tcell.KeyEnter:
 				w.cursor.SetPos(0, w.cursor.y+1, s)
+			
+			case tcell.KeyUp:
+				w.cursor.SetPos(w.cursor.x, w.cursor.y-1, s)
 
+			case tcell.KeyDown:
+				w.cursor.SetPos(w.cursor.x, w.cursor.y+1, s)
+
+			case tcell.KeyLeft:
+				w.cursor.SetPos(w.cursor.x-1, w.cursor.y, s)
+
+			case tcell.KeyRight:
+				w.cursor.SetPos(w.cursor.x+1, w.cursor.y, s)
 			}
-
-			// if ev.Key() == tcell.KeyEscape {
-			// 	s.Fini()
-			// 	os.Exit(0)
-			// }
-			// if ev.Key() == tcell.KeyEnter {
-			// 	w.x = -1
-			// 	w.y++
-			// }
-			// if ev.Key() == tcell.KeyBackspace || ev.Key() == tcell.KeyBackspace2 {
-			// 	// w.x--
-			// 	// w.Write('', s)
-			// 	// w.WriteDebug(s, "Backspace")
-			// 	// return
-
-			// }
-			// if ch := ev.Rune(); ch != 0 {
-			// 	w.Write(ch, s)
-			// 	w.WriteDebug(s, ev.Name())
-			// }
-
 		}
 	}
 }
