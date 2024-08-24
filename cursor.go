@@ -1,10 +1,15 @@
 package main
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"fmt"
+
+	"github.com/gdamore/tcell/v2"
+)
 
 type Cursor struct {
 	x int
 	y int
+	*Window
 }
 
 func (c *Cursor) SetPos(x, y int, s tcell.Screen) {
@@ -26,5 +31,11 @@ func (c *Cursor) SetPos(x, y int, s tcell.Screen) {
 	c.y = y
 
 	s.ShowCursor(c.x, c.y)
-	s.Show()
+
+
+	primary, _, _, width :=  s.GetContent(c.x, c.y)
+	c.WriteDebug(s, fmt.Sprintf("Item: %v, Width: %v", primary, width))
+
+	// i want to use writeDebug method from window here
+
 }
