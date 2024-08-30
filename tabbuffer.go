@@ -1,7 +1,7 @@
 package main
 
 type TabBuffer struct {
-	lines    []LineBuffer
+	lines    []*LineBuffer
 	gapStart int
 	gapEnd   int
 	gapSize  int
@@ -10,10 +10,12 @@ type TabBuffer struct {
 }
 
 func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
-	lines := make([]LineBuffer, 0)
+	lines := make([]*LineBuffer, 0)
 	cursor := &Cursor{0, 0, screen}
 
-	lines = append(lines, *NewGapBuffer(s, 10, screen, cursor))
+
+
+	lines = append(lines, NewGapBuffer(s, 10, screen, cursor))
 
 	gapStart := 1
 	gapEnd := gapStart + gapSize
@@ -23,8 +25,13 @@ func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
 		gapSize:  gapSize,
 		gapEnd:   gapEnd,
 		lines:    lines,
+		cursor:   cursor,
 	}
 }
+
+// func (tb *TabBuffer) String() string {
+// 	return "TabBuffer"
+// }
 
 func (tb *TabBuffer) GetGapSize() int {
 	return tb.gapEnd - tb.gapStart
@@ -32,7 +39,7 @@ func (tb *TabBuffer) GetGapSize() int {
 
 func (tb *TabBuffer) _Grow() {
 	newCapacity := tb.gapSize * 2
-	newLines := make([]LineBuffer, newCapacity+len(tb.lines))
+	newLines := make([]*LineBuffer, newCapacity+len(tb.lines))
 
 	copy(newLines, tb.lines[:tb.gapStart])
 
@@ -52,7 +59,7 @@ func (tb *TabBuffer) GoLeft() {
 	tb.lines[tb.gapEnd] = tb.lines[tb.gapStart-1]
 	tb.gapEnd--
 
-	tb.lines[tb.gapStart] = LineBuffer{}
+	tb.lines[tb.gapStart] = &LineBuffer{}
 	tb.gapStart--
 }
 
@@ -64,7 +71,7 @@ func (tb *TabBuffer) GoRight() {
 	tb.lines[tb.gapStart] = tb.lines[tb.gapEnd+1]
 	tb.gapStart++
 
-	tb.lines[tb.gapEnd+1] = LineBuffer{}
+	tb.lines[tb.gapEnd+1] = &LineBuffer{}
 	tb.gapEnd++
 }
 
@@ -74,7 +81,7 @@ func (tb *TabBuffer) AddLine(s string) {
 	}
 
 	line := NewGapBuffer(s, 10, tb.screen, tb.cursor)
-	tb.lines[tb.gapStart] = *line
+	tb.lines[tb.gapStart] = line
 	tb.gapStart++
 }
 
