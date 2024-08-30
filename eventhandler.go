@@ -6,7 +6,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-func HandleEvents(screen *Screen){
+func HandleEvents(screen *Screen) {
 	tScreen := screen.tScreen
 	for {
 		switch ev := tScreen.PollEvent().(type) {
@@ -19,14 +19,33 @@ func HandleEvents(screen *Screen){
 				tScreen.Fini()
 				os.Exit(0)
 
-				// case tcell.KeyRune:
-				// 	ch := ev.Rune()
-				// 	w.Write(ch, s)
+			case tcell.KeyRune:
+				ch := ev.Rune()
+				HandleInsertRune(screen, ch)
 
-				case tcell.KeyBackspace, tcell.KeyBackspace2:
-					// screen.Delete(s)
-					screen.WriteDebug( "Backspace")
+			case tcell.KeyBackspace, tcell.KeyBackspace2:
+				// screen.Delete(s)
+				screen.WriteDebug("Backspace")
 			}
 		}
 	}
+}
+
+func HandleInsertRune(screen *Screen, r rune) {
+	// figure out where the cursor is
+	// insert the rune at the cursor
+	tb := screen.tabBuffer
+
+	// lb := tb.lines[0]
+
+	cursor := tb.cursor
+	line := tb.lines[cursor.y]
+	line.Insert(r)
+}
+
+func HandleBackspace(screen *Screen) {
+	tb := screen.tabBuffer
+	cursor := tb.cursor
+	line := tb.lines[cursor.y]
+	line.Delete()
 }
