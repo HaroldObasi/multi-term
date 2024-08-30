@@ -35,6 +35,8 @@ func (c *Cursor) SetPos(x, y int) {
 
 	c.screen.tScreen.ShowCursor(c.x, c.y)
 
-	primary, _, _, width := c.screen.tScreen.GetContent(c.x, c.y)
-	c.screen.WriteDebug(fmt.Sprintf("Item: %v, Width: %v", primary, width))
+	// primary, _, _, width := c.screen.tScreen.GetContent(c.x, c.y)
+	// c.screen.WriteDebug(fmt.Sprintf("Item: %v, Width: %v", primary, width))
+
+	c.screen.WriteDebug(fmt.Sprintf("Col: %v, Row: %v", c.x, c.y))
 }
