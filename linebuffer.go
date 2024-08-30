@@ -68,7 +68,7 @@ func (lb *LineBuffer) Insert(r rune) {
 	lb.buffer[lb.gapStart] = r
 
 	lb.screen.tScreen.SetContent(lb.cursor.x, lb.cursor.y, r, nil, tcell.StyleDefault)
-	lb.cursor.x ++
+	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y)
 
 	lb.screen.tScreen.Show()
 
