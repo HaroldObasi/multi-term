@@ -22,6 +22,9 @@ func (lb *LineBuffer) String() string {
 
 func NewGapBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBuffer {
 
+	// screen.WriteDebug(fmt.Sprintf("Recieved cursr: %v", cursor.x))
+	// time.Sleep(3 * time.Second)
+
 	runes := []rune(s)
 	buffer := make([]rune, gapSize+len(runes))
 
@@ -55,10 +58,12 @@ func (lb *LineBuffer) GetText() string {
 	return sb.String()
 }
 
-func (lb *LineBuffer) Write(s string){
+func (lb *LineBuffer) Write(s string) {
 	for _, r := range s {
 		lb.Insert(r)
 	}
+	// lb.screen.WriteDebug("Done writing string")
+
 }
 
 func (lb *LineBuffer) Insert(r rune) {
@@ -72,8 +77,23 @@ func (lb *LineBuffer) Insert(r rune) {
 
 	lb.screen.tScreen.Show()
 
-	lb.screen.WriteDebug("Inserting rune")
 	lb.gapStart++
+
+}
+
+func (lb *LineBuffer) Delete() {
+	if lb.gapStart <= 0 {
+		return
+	}
+
+	lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, 0, nil, tcell.StyleDefault)
+
+	lb.gapStart--
+	lb.buffer[lb.gapStart] = 0
+
+	lb.cursor.SetPos(lb.gapStart ,lb.cursor.y)
+
+	lb.screen.tScreen.Show()
 }
 
 func (lb *LineBuffer) Grow() {
@@ -132,15 +152,8 @@ func (lb *LineBuffer) GoTo(pos int) {
 	}
 }
 
-func (lb *LineBuffer) Delete() {
-	if lb.gapStart <= 0 {
-		return
-	}
 
-	lb.gapStart--
-	lb.buffer[lb.gapStart] = 0
-}
-
+// deprecate this
 func (lb *LineBuffer) ChangeCursorPos(index int) {
 
 	// gap starts on cursor index
