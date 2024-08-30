@@ -11,7 +11,7 @@ type TabBuffer struct {
 
 func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
 	lines := make([]LineBuffer, 0)
-	cursor := &Cursor{0, 0}
+	cursor := &Cursor{0, 0, screen}
 
 	lines = append(lines, *NewGapBuffer(s, 10, screen, cursor))
 
