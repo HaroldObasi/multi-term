@@ -22,7 +22,8 @@ func NewScreen() (*Screen, error) {
 	s.SetStyle(defStyle)
 	s.ShowCursor(0, 0)
 
-	screen := &Screen{tScreen: s, tabBuffer: NewTabBuffer("", 10)}
+	screen := &Screen{tScreen: s}
+	screen.tabBuffer = NewTabBuffer("Hello, World!", 10, screen)
 
 	screen.CreateDebugArea()
 	return screen, nil

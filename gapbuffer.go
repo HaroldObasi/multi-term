@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"strings"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 type LineBuffer struct {
@@ -10,13 +12,15 @@ type LineBuffer struct {
 	gapStart int
 	gapEnd   int
 	buffer   []rune
+	screen   *Screen
+	cursor   *Cursor
 }
 
 func (lb *LineBuffer) String() string {
 	return fmt.Sprintf("Gap Start: %v, Gap End: %v, Buffer: %v", lb.gapStart, lb.gapEnd, lb.GetText())
 }
 
-func NewGapBuffer(s string, gapSize int) *LineBuffer {
+func NewGapBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBuffer {
 
 	runes := []rune(s)
 	buffer := make([]rune, gapSize+len(runes))
@@ -26,12 +30,17 @@ func NewGapBuffer(s string, gapSize int) *LineBuffer {
 	gapStart := len(runes)
 	gapEnd := (gapStart + gapSize) - 1
 
-	return &LineBuffer{
+	lb := &LineBuffer{
 		gapStart: gapStart,
 		gapSize:  gapSize,
 		gapEnd:   gapEnd,
 		buffer:   buffer,
+		screen:   screen,
+		cursor:   cursor,
 	}
+
+	lb.Write(s)
+	return lb
 }
 
 func (lb *LineBuffer) GetGapSize() int {
@@ -46,11 +55,24 @@ func (lb *LineBuffer) GetText() string {
 	return sb.String()
 }
 
+func (lb *LineBuffer) Write(s string){
+	for _, r := range s {
+		lb.Insert(r)
+	}
+}
+
 func (lb *LineBuffer) Insert(r rune) {
 	if lb.GetGapSize() <= 1 {
 		lb.Grow()
 	}
 	lb.buffer[lb.gapStart] = r
+
+	lb.screen.tScreen.SetContent(lb.cursor.x, lb.cursor.y, r, nil, tcell.StyleDefault)
+	lb.cursor.x ++
+
+	lb.screen.tScreen.Show()
+
+	lb.screen.WriteDebug("Inserting rune")
 	lb.gapStart++
 }
 
