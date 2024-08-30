@@ -24,8 +24,7 @@ func HandleEvents(screen *Screen) {
 				HandleInsertRune(screen, ch)
 
 			case tcell.KeyBackspace, tcell.KeyBackspace2:
-				// screen.Delete(s)
-				screen.WriteDebug("Backspace")
+				HandleBackspace(screen)
 			}
 		}
 	}
