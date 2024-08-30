@@ -7,11 +7,14 @@ type Cursor struct {
 	y int
 
 	screen *Screen
-
 }
 
-//use this method to set the position of the cursor
-//dont directly change the x and y values
+func (c *Cursor) String() string{
+	return fmt.Sprintf("Cursor: (%v, %v)", c.x, c.y)
+}
+
+// use this method to set the position of the cursor
+// dont directly change the x and y values
 func (c *Cursor) SetPos(x, y int) {
 	sWidth, sHeight := c.screen.tScreen.Size()
 
@@ -34,7 +37,4 @@ func (c *Cursor) SetPos(x, y int) {
 
 	primary, _, _, width := c.screen.tScreen.GetContent(c.x, c.y)
 	c.screen.WriteDebug(fmt.Sprintf("Item: %v, Width: %v", primary, width))
-
-	// i want to use writeDebug method from window here
-
 }
