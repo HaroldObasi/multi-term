@@ -5,18 +5,18 @@ import (
 	"strings"
 )
 
-type GapBuffer struct {
+type LineBuffer struct {
 	gapSize  int
 	gapStart int
 	gapEnd   int
 	buffer   []rune
 }
 
-func (g *GapBuffer) String() string {
-	return fmt.Sprintf("Gap Start: %v, Gap End: %v, Buffer: %v", g.gapStart, g.gapEnd, g.GetText())
+func (lb *LineBuffer) String() string {
+	return fmt.Sprintf("Gap Start: %v, Gap End: %v, Buffer: %v", lb.gapStart, lb.gapEnd, lb.GetText())
 }
 
-func NewGapBuffer(s string, gapSize int) *GapBuffer {
+func NewGapBuffer(s string, gapSize int) *LineBuffer {
 
 	runes := []rune(s)
 	buffer := make([]rune, gapSize+len(runes))
@@ -26,7 +26,7 @@ func NewGapBuffer(s string, gapSize int) *GapBuffer {
 	gapStart := len(runes)
 	gapEnd := (gapStart + gapSize) - 1
 
-	return &GapBuffer{
+	return &LineBuffer{
 		gapStart: gapStart,
 		gapSize:  gapSize,
 		gapEnd:   gapEnd,
@@ -34,87 +34,113 @@ func NewGapBuffer(s string, gapSize int) *GapBuffer {
 	}
 }
 
-func (g *GapBuffer) GetGapSize() int {
-	return (g.gapEnd - g.gapStart) + 1
+func (lb *LineBuffer) GetGapSize() int {
+	return (lb.gapEnd - lb.gapStart) + 1
 }
 
-func (g *GapBuffer) GetText() string {
+func (lb *LineBuffer) GetText() string {
 	var sb strings.Builder
-	sb.Grow(len(g.buffer) - g.GetGapSize())
-	sb.WriteString(string(g.buffer[:g.gapStart]))
-	sb.WriteString(string(g.buffer[g.gapEnd+1:]))
+	sb.Grow(len(lb.buffer) - lb.GetGapSize())
+	sb.WriteString(string(lb.buffer[:lb.gapStart]))
+	sb.WriteString(string(lb.buffer[lb.gapEnd+1:]))
 	return sb.String()
 }
 
-func (g *GapBuffer) Insert(r rune) {
-	if g.GetGapSize() <= 1 {
-		g.Grow()
+func (lb *LineBuffer) Insert(r rune) {
+	if lb.GetGapSize() <= 1 {
+		lb.Grow()
 	}
-	g.buffer[g.gapStart] = r
-	g.gapStart++
+	lb.buffer[lb.gapStart] = r
+	lb.gapStart++
 }
 
-func (g *GapBuffer) Grow() {
-	newCapacity := g.gapSize * 2
-	newBuffer := make([]rune, newCapacity+len(g.buffer))
+func (lb *LineBuffer) Grow() {
+	newCapacity := lb.gapSize * 2
+	newBuffer := make([]rune, newCapacity+len(lb.buffer))
 
+	copy(newBuffer, lb.buffer[:lb.gapStart])
 
-	copy(newBuffer, g.buffer[:g.gapStart])
+	newGapEnd := lb.gapStart + newCapacity
+	copy(newBuffer[newGapEnd:], lb.buffer[lb.gapEnd:])
 
-	newGapEnd := g.gapStart + newCapacity
-	copy(newBuffer[newGapEnd:], g.buffer[g.gapEnd:])
-
-	g.buffer = newBuffer
-	g.gapEnd = newGapEnd
+	lb.buffer = newBuffer
+	lb.gapEnd = newGapEnd
 
 }
 
-func (g *GapBuffer) GoLeft() {
-	if g.gapStart <= 0 {
+func (lb *LineBuffer) GoLeft() {
+	if lb.gapStart <= 0 {
 		return
 	}
 
-	g.buffer[g.gapEnd] = g.buffer[g.gapStart-1]
-	g.gapEnd--
+	lb.buffer[lb.gapEnd] = lb.buffer[lb.gapStart-1]
+	lb.gapEnd--
 
-	g.buffer[g.gapStart-1] = 0 // Clear the original position
-	g.gapStart--
+	lb.buffer[lb.gapStart-1] = 0 // Clear the original position
+	lb.gapStart--
 }
 
-func (g *GapBuffer) GoRight() {
-	if g.gapEnd >= len(g.buffer)-1 {
+func (lb *LineBuffer) GoRight() {
+	if lb.gapEnd >= len(lb.buffer)-1 {
 		return
 	}
 
-	g.buffer[g.gapStart] = g.buffer[g.gapEnd+1]
-	g.gapStart++
+	lb.buffer[lb.gapStart] = lb.buffer[lb.gapEnd+1]
+	lb.gapStart++
 
-	g.buffer[g.gapEnd+1] = 0 // Clear the original position
-	g.gapEnd++
+	lb.buffer[lb.gapEnd+1] = 0 // Clear the original position
+	lb.gapEnd++
 }
 
-func (g *GapBuffer) ChangeCursorPos(index int) {
+func (lb *LineBuffer) GoTo(pos int) {
+	if pos < 0 || pos >= len(lb.buffer) {
+		return
+	}
+	// [1, 2, 3, 4, 0, 0, 0]
+	if pos < lb.gapStart {
+		// loop till gapstart
+		for i := pos; i < lb.gapStart; i++ {
+			lb.GoLeft()
+		}
+	} else if pos > lb.gapStart {
+		// loop till gapend
+		for i := pos; i > lb.gapEnd; i-- {
+			lb.GoRight()
+		}
+	}
+}
+
+func (lb *LineBuffer) Delete() {
+	if lb.gapStart <= 0 {
+		return
+	}
+
+	lb.gapStart--
+	lb.buffer[lb.gapStart] = 0
+}
+
+func (lb *LineBuffer) ChangeCursorPos(index int) {
 
 	// gap starts on cursor index
 
-	if index < 0 || index >= len(g.buffer) {
+	if index < 0 || index >= len(lb.buffer) {
 		return // Invalid index
 	}
 
-	gapSize := g.GetGapSize()
+	gapSize := lb.GetGapSize()
 
-	if index < g.gapStart {
+	if index < lb.gapStart {
 		// Move gap left
-		tmp := make([]rune, g.gapStart-index)
-		copy(tmp, g.buffer[index:g.gapStart])
-		copy(g.buffer[index:index+gapSize], g.buffer[g.gapStart:g.gapEnd+1]) //good
+		tmp := make([]rune, lb.gapStart-index)
+		copy(tmp, lb.buffer[index:lb.gapStart])
+		copy(lb.buffer[index:index+gapSize], lb.buffer[lb.gapStart:lb.gapEnd+1]) //good
 
-		g.gapStart = index               //good
-		g.gapEnd = (index + gapSize) - 1 //good
+		lb.gapStart = index               //good
+		lb.gapEnd = (index + gapSize) - 1 //good
 
-		copy(g.buffer[g.gapEnd+1:(g.gapEnd+1)+len(tmp)], tmp) // correct index on lside,
+		copy(lb.buffer[lb.gapEnd+1:(lb.gapEnd+1)+len(tmp)], tmp) // correct index on lside,
 
-	} else if index > g.gapStart {
+	} else if index > lb.gapStart {
 
 	}
 
