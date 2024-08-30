@@ -5,97 +5,36 @@ import (
 	"os"
 
 	"github.com/gdamore/tcell/v2"
-
-	"github.com/mattn/go-runewidth"
 )
-
-func emitStr(s tcell.Screen, x, y int, style tcell.Style, str string) {
-	for _, c := range str {
-		var comb []rune
-		w := runewidth.RuneWidth(c)
-		if w == 0 {
-			comb = []rune{c}
-			c = ' '
-			w = 1
-		}
-		s.SetContent(x, y, c, comb, style)
-		x += w
-	}
-}
-
-func displayHelloWorld(s tcell.Screen) {
-	w, h := s.Size()
-	s.Clear()
-	style := tcell.StyleDefault.Foreground(tcell.ColorCadetBlue.TrueColor()).Background(tcell.ColorWhite)
-	emitStr(s, w/2-7, h/2, style, "Hello, World!")
-	emitStr(s, w/2-9, h/2+1, tcell.StyleDefault, "Press ESC to exit.")
-	s.Show()
-}
 
 // This program just prints "Hello, World!".  Press ESC to exit.
 func main() {
 
-	w := Window{
-		cursor: Cursor{
-			x: 0,
-			y: 0,
-		},
-	}
-
-	s, e := tcell.NewScreen()
-	if e != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", e)
+	screen, err := NewScreen()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
-	if e := s.Init(); e != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", e)
-		os.Exit(1)
-	}
-
-	defStyle := tcell.StyleDefault.
-		Background(tcell.ColorBlack).
-		Foreground(tcell.ColorWhite)
-
-	s.SetStyle(defStyle)
-	s.ShowCursor(0, 0)
-
-	// displayHelloWorld(s)
-	w.CreateDebugArea(s)
+	tScreen := screen.tScreen
 
 	for {
-		switch ev := s.PollEvent().(type) {
+		switch ev := tScreen.PollEvent().(type) {
 		case *tcell.EventResize:
-			s.Sync()
-			// displayHelloWorld(s)
+			tScreen.Sync()
 		case *tcell.EventKey:
 			switch ev.Key() {
 
 			case tcell.KeyEscape:
-				s.Fini()
+				tScreen.Fini()
 				os.Exit(0)
-		
-			case tcell.KeyRune:
-				ch := ev.Rune()
-				w.Write(ch, s)
 
-			case tcell.KeyBackspace, tcell.KeyBackspace2:
-				w.Delete(s)
-				w.WriteDebug(s, "Backspace")
+				// case tcell.KeyRune:
+				// 	ch := ev.Rune()
+				// 	w.Write(ch, s)
 
-			case tcell.KeyEnter:
-				w.cursor.SetPos(0, w.cursor.y+1, s)
-			
-			case tcell.KeyUp:
-				w.cursor.SetPos(w.cursor.x, w.cursor.y-1, s)
-
-			case tcell.KeyDown:
-				w.cursor.SetPos(w.cursor.x, w.cursor.y+1, s)
-
-			case tcell.KeyLeft:
-				w.cursor.SetPos(w.cursor.x-1, w.cursor.y, s)
-
-			case tcell.KeyRight:
-				w.cursor.SetPos(w.cursor.x+1, w.cursor.y, s)
+				case tcell.KeyBackspace, tcell.KeyBackspace2:
+					// screen.Delete(s)
+					screen.WriteDebug( "Backspace")
 			}
 		}
 	}
