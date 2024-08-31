@@ -19,6 +19,9 @@ func HandleEvents(screen *Screen) {
 				tScreen.Fini()
 				os.Exit(0)
 
+			case tcell.KeyEnter:
+				HandleReturn(screen)
+
 			case tcell.KeyRune:
 				ch := ev.Rune()
 				HandleInsertRune(screen, ch)
@@ -47,4 +50,14 @@ func HandleBackspace(screen *Screen) {
 	cursor := tb.cursor
 	line := tb.lines[cursor.y]
 	line.Delete()
+}
+
+func HandleReturn (screen *Screen) {
+	tb := screen.tabBuffer
+
+	cursor := tb.cursor
+	line := tb.lines[cursor.y]
+	line.Insert('\n')
+
+	tb.AddLine("")
 }
