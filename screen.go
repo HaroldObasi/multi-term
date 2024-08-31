@@ -23,7 +23,7 @@ func NewScreen() (*Screen, error) {
 	s.ShowCursor(0, 0)
 
 	screen := &Screen{tScreen: s}
-	screen.tabBuffer = NewTabBuffer("Hello, World!", 10, screen)
+	screen.tabBuffer = NewTabBuffer("", 10, screen)
 
 	screen.CreateDebugArea()
 	return screen, nil
@@ -42,14 +42,14 @@ func (s *Screen) CreateDebugArea() {
 	s.tScreen.Show()
 }
 
-func (s *Screen) WriteDebug(str string) {
+func (s *Screen) WriteDebug(str string, y int) {
 	style := tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorWhite)
 	_, sHeight := s.tScreen.Size()
 
 	startingPoint := 5
 
 	for i, char := range str {
-		s.tScreen.SetContent(i, sHeight-startingPoint, char, nil, style)
+		s.tScreen.SetContent(i, (sHeight-startingPoint) + y, char, nil, style)
 	}
 
 	s.tScreen.Show()
