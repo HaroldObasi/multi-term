@@ -180,3 +180,8 @@ func (lb *LineBuffer) ChangeCursorPos(index int) {
 	}
 
 }
+
+// returns the length of the buffer excluding the gap
+func (lb *LineBuffer) Len() int {
+	return len(lb.buffer) - lb.GetGapSize()
+}

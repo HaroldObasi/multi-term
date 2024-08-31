@@ -19,6 +19,9 @@ func HandleEvents(screen *Screen) {
 				tScreen.Fini()
 				os.Exit(0)
 
+			case tcell.KeyUp, tcell.KeyDown, tcell.KeyLeft, tcell.KeyRight:
+				HandleDirection(screen, ev.Key())
+
 			case tcell.KeyEnter:
 				HandleReturn(screen)
 
@@ -60,4 +63,27 @@ func HandleReturn (screen *Screen) {
 	line.Insert('\n')
 
 	tb.AddLine("")
+}
+
+func HandleDirection(screen *Screen, key tcell.Key){
+	tb := screen.tabBuffer
+	cursor := tb.cursor
+
+	switch key {
+	case tcell.KeyUp:
+		cursor.SetPos(cursor.x, cursor.y-1)
+
+	case tcell.KeyDown:
+		if cursor.y < tb.Len() {
+			cursor.SetPos(cursor.x, cursor.y+1)
+		}
+
+	case tcell.KeyLeft:
+		cursor.SetPos(cursor.x-1, cursor.y)
+
+	case tcell.KeyRight:
+		if cursor.x < tb.lines[cursor.y].Len() - 1 {
+			cursor.SetPos(cursor.x+1, cursor.y)
+		}
+	}
 }

@@ -36,7 +36,7 @@ func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
 // }
 
 func (tb *TabBuffer) GetGapSize() int {
-	return tb.gapEnd - tb.gapStart
+	return (tb.gapEnd - tb.gapStart) + 1
 }
 
 func (tb *TabBuffer) _Grow() {
@@ -96,4 +96,11 @@ func (tb *TabBuffer) Write(char rune) {
 	selectedLine := tb.lines[tb.cursor.y]
 	selectedLine.GoTo(tb.cursor.x)
 	selectedLine.Insert(char)
+}
+
+
+
+// gets length of lines exluding the gap
+func (tb *TabBuffer) Len() int {
+	return len(tb.lines) - tb.GetGapSize()
 }
