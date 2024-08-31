@@ -9,7 +9,7 @@ type Cursor struct {
 	screen *Screen
 }
 
-func (c *Cursor) String() string{
+func (c *Cursor) String() string {
 	return fmt.Sprintf("Cursor: (%v, %v)", c.x, c.y)
 }
 

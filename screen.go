@@ -49,7 +49,7 @@ func (s *Screen) WriteDebug(str string, y int) {
 	startingPoint := 5
 
 	for i, char := range str {
-		s.tScreen.SetContent(i, (sHeight-startingPoint) + y, char, nil, style)
+		s.tScreen.SetContent(i, (sHeight-startingPoint)+y, char, nil, style)
 	}
 
 	s.tScreen.Show()

@@ -98,8 +98,6 @@ func (tb *TabBuffer) Write(char rune) {
 	selectedLine.Insert(char)
 }
 
-
-
 // gets length of lines exluding the gap
 func (tb *TabBuffer) Len() int {
 	return len(tb.lines) - tb.GetGapSize()

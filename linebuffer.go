@@ -91,7 +91,7 @@ func (lb *LineBuffer) Delete() {
 	lb.gapStart--
 	lb.buffer[lb.gapStart] = 0
 
-	lb.cursor.SetPos(lb.gapStart ,lb.cursor.y)
+	lb.cursor.SetPos(lb.gapStart, lb.cursor.y)
 
 	lb.screen.tScreen.Show()
 }
@@ -151,7 +151,6 @@ func (lb *LineBuffer) GoTo(pos int) {
 		}
 	}
 }
-
 
 // deprecate this
 func (lb *LineBuffer) ChangeCursorPos(index int) {

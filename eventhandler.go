@@ -55,7 +55,7 @@ func HandleBackspace(screen *Screen) {
 	line.Delete()
 }
 
-func HandleReturn (screen *Screen) {
+func HandleReturn(screen *Screen) {
 	tb := screen.tabBuffer
 
 	cursor := tb.cursor
@@ -65,7 +65,7 @@ func HandleReturn (screen *Screen) {
 	tb.AddLine("")
 }
 
-func HandleDirection(screen *Screen, key tcell.Key){
+func HandleDirection(screen *Screen, key tcell.Key) {
 	tb := screen.tabBuffer
 	cursor := tb.cursor
 
@@ -82,7 +82,7 @@ func HandleDirection(screen *Screen, key tcell.Key){
 		cursor.SetPos(cursor.x-1, cursor.y)
 
 	case tcell.KeyRight:
-		if cursor.x < tb.lines[cursor.y].Len() - 1 {
+		if cursor.x < tb.lines[cursor.y].Len()-1 {
 			cursor.SetPos(cursor.x+1, cursor.y)
 		}
 	}
