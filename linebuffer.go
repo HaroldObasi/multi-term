@@ -70,7 +70,10 @@ func (lb *LineBuffer) Insert(r rune) {
 	if lb.GetGapSize() <= 1 {
 		lb.Grow()
 	}
+
+	lb.GoTo(lb.cursor.x)
 	lb.buffer[lb.gapStart] = r
+
 
 	lb.screen.tScreen.SetContent(lb.cursor.x, lb.cursor.y, r, nil, tcell.StyleDefault)
 	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y)
@@ -78,6 +81,9 @@ func (lb *LineBuffer) Insert(r rune) {
 	lb.screen.tScreen.Show()
 
 	lb.gapStart++
+
+	lb.screen.WriteDebug(fmt.Sprint(lb.buffer), 1)
+	lb.screen.WriteDebug(lb.GetText(), 2)
 
 }
 
@@ -134,22 +140,34 @@ func (lb *LineBuffer) GoRight() {
 	lb.gapEnd++
 }
 
+
+// we want the gapstart to be at pos
 func (lb *LineBuffer) GoTo(pos int) {
+	lb.screen.WriteDebug(fmt.Sprintf("Old gap start: %d, pos: %d", lb.gapStart, pos), 3)
+
 	if pos < 0 || pos >= len(lb.buffer) {
 		return
 	}
-	// [1, 2, 3, 4, 0, 0, 0]
+
+
 	if pos < lb.gapStart {
 		// loop till gapstart
-		for i := pos; i < lb.gapStart; i++ {
+		diff := lb.gapStart - pos
+
+		for i := 0; i < diff; i++ {
 			lb.GoLeft()
 		}
 	} else if pos > lb.gapStart {
 		// loop till gapend
-		for i := pos; i > lb.gapEnd; i-- {
+		diff := pos - lb.gapStart
+
+		for i := 0; i < diff; i++ {
 			lb.GoRight()
 		}
+
 	}
+	lb.screen.WriteDebug(fmt.Sprintf("new gap start: %d", lb.gapStart), 4)
+
 }
 
 // deprecate this
