@@ -74,18 +74,20 @@ func (lb *LineBuffer) Insert(r rune) {
 	lb.GoTo(lb.cursor.x)
 	lb.buffer[lb.gapStart] = r
 
-	//iterate from gapStart to the end of lb.GetString, and Set content
-
-	lb.screen.tScreen.SetContent(lb.cursor.x, lb.cursor.y, r, nil, tcell.StyleDefault)
-
+	x := lb.gapStart
 	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y)
 
 	lb.gapStart++
 
-	x := lb.gapStart
 	str := lb.GetText()
+	lb.screen.WriteDebug(fmt.Sprint(lb.buffer), 1)
 
-	for _, r := range str[lb.gapStart:] {
+	lb.screen.WriteDebug(fmt.Sprintf("should: %v ",lb.GetText()[x:]), 3)
+
+	// iterate over the string from the gapstart to the end to update the screen
+	for _, r := range str[x:] {
+		lb.screen.WriteDebug(fmt.Sprintf("iter: %v", r), 2)
+
 		lb.screen.tScreen.SetContent(x, lb.cursor.y, r, nil, tcell.StyleDefault)
 		x++
 	}	
@@ -94,8 +96,7 @@ func (lb *LineBuffer) Insert(r rune) {
 
 	lb.screen.WriteDebug(fmt.Sprintf("string %v" ,lb.GetText()), 4)
 
-	lb.screen.WriteDebug(fmt.Sprint(lb.buffer), 1)
-	lb.screen.WriteDebug(lb.GetText(), 2)
+
 
 }
 
@@ -104,10 +105,17 @@ func (lb *LineBuffer) Delete() {
 		return
 	}
 
-	lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, 0, nil, tcell.StyleDefault)
+	lb.GoTo(lb.cursor.x)
 
 	lb.gapStart--
 	lb.buffer[lb.gapStart] = 0
+
+	
+	
+	
+	lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, 0, nil, tcell.StyleDefault)
+
+
 
 	lb.cursor.SetPos(lb.gapStart, lb.cursor.y)
 
