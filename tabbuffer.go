@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type TabBuffer struct {
 	lines    []*LineBuffer
 	gapStart int
@@ -84,7 +82,6 @@ func (tb *TabBuffer) AddLine(s string) {
 		// tb._Grow()
 	}
 
-	tb.screen.WriteDebug(fmt.Sprintf("GapStart: %v, length: %v", tb.gapStart, len(tb.lines)), 1)
 	line := NewGapBuffer(s, 10, tb.screen, tb.cursor)
 	tb.lines[tb.gapStart] = line
 
