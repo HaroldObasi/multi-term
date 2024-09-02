@@ -74,13 +74,25 @@ func (lb *LineBuffer) Insert(r rune) {
 	lb.GoTo(lb.cursor.x)
 	lb.buffer[lb.gapStart] = r
 
+	//iterate from gapStart to the end of lb.GetString, and Set content
 
 	lb.screen.tScreen.SetContent(lb.cursor.x, lb.cursor.y, r, nil, tcell.StyleDefault)
+
 	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y)
+
+	lb.gapStart++
+
+	x := lb.gapStart
+	str := lb.GetText()
+
+	for _, r := range str[lb.gapStart:] {
+		lb.screen.tScreen.SetContent(x, lb.cursor.y, r, nil, tcell.StyleDefault)
+		x++
+	}	
 
 	lb.screen.tScreen.Show()
 
-	lb.gapStart++
+	lb.screen.WriteDebug(fmt.Sprintf("string %v" ,lb.GetText()), 4)
 
 	lb.screen.WriteDebug(fmt.Sprint(lb.buffer), 1)
 	lb.screen.WriteDebug(lb.GetText(), 2)
@@ -141,9 +153,9 @@ func (lb *LineBuffer) GoRight() {
 }
 
 
-// we want the gapstart to be at pos
+// Moves the gap to start at the specified position, so it is the same as the cursor position
 func (lb *LineBuffer) GoTo(pos int) {
-	lb.screen.WriteDebug(fmt.Sprintf("Old gap start: %d, pos: %d", lb.gapStart, pos), 3)
+	// lb.screen.WriteDebug(fmt.Sprintf("Old gap start: %d, pos: %d", lb.gapStart, pos), 3)
 
 	if pos < 0 || pos >= len(lb.buffer) {
 		return
@@ -166,7 +178,7 @@ func (lb *LineBuffer) GoTo(pos int) {
 		}
 
 	}
-	lb.screen.WriteDebug(fmt.Sprintf("new gap start: %d", lb.gapStart), 4)
+	// lb.screen.WriteDebug(fmt.Sprintf("new gap start: %d", lb.gapStart), 4)
 
 }
 
