@@ -19,6 +19,10 @@ func HandleEvents(screen *Screen) {
 				tScreen.Fini()
 				os.Exit(0)
 
+			case tcell.KeyCtrlS:
+				// save the file
+				HandleSave(screen)
+
 			case tcell.KeyUp, tcell.KeyDown, tcell.KeyLeft, tcell.KeyRight:
 				HandleDirection(screen, ev.Key())
 
@@ -34,6 +38,12 @@ func HandleEvents(screen *Screen) {
 			}
 		}
 	}
+}
+
+func HandleSave(screen *Screen) {
+	// tb := screen.tabBuffer
+	// file := tb.file
+	// file.Save(tb)
 }
 
 func HandleInsertRune(screen *Screen, r rune) {
