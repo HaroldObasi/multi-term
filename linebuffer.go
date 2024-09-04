@@ -82,23 +82,17 @@ func (lb *LineBuffer) Insert(r rune) {
 	str := lb.GetText()
 	lb.screen.WriteDebug(fmt.Sprint(lb.buffer), 1)
 
-	lb.screen.WriteDebug(fmt.Sprintf("should: %v ",lb.GetText()[x:]), 3)
-
 	// iterate over the string from the gapstart to the end to update the screen
 	for _, r := range str[x:] {
-		lb.screen.WriteDebug(fmt.Sprintf("iter: %v", r), 2)
-
 		lb.screen.tScreen.SetContent(x, lb.cursor.y, r, nil, tcell.StyleDefault)
 		x++
 	}	
 
 	lb.screen.tScreen.Show()
-
-	lb.screen.WriteDebug(fmt.Sprintf("string %v" ,lb.GetText()), 4)
-
-
-
 }
+// 100045
+
+// 1_45 => _455 ??
 
 func (lb *LineBuffer) Delete() {
 	if lb.gapStart <= 0 {
@@ -107,18 +101,25 @@ func (lb *LineBuffer) Delete() {
 
 	lb.GoTo(lb.cursor.x)
 
-	lb.gapStart--
-	lb.buffer[lb.gapStart] = 0
+	lb.buffer[lb.gapStart-1] = 0
+	lb.gapStart --
 
-	
-	
-	
-	lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, 0, nil, tcell.StyleDefault)
+	// lb.screen.WriteDebug(fmt.Sprintf("Cursor: %v", lb.cursor.x), 3)
+	x := lb.cursor.x
+	if lb.gapEnd >= len(lb.buffer) - 1 {
+		lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, ' ', nil, tcell.StyleDefault)
+	} else {
+		lb.screen.WriteDebug(fmt.Sprintf("it: %v", lb.buffer[lb.gapEnd + 1:]), 2)
+		// iterate through the items after the buffer,
+		// print them from the user's index, all the way down
+		for _, r := range lb.buffer[lb.gapEnd + 1:]{
+			lb.screen.tScreen.SetContent(x-1, lb.cursor.y, r, nil, tcell.StyleDefault)
+			x++
+		}
 
+	}
 
-
-	lb.cursor.SetPos(lb.gapStart, lb.cursor.y)
-
+	lb.cursor.SetPos(lb.cursor.x-1, lb.cursor.y)
 	lb.screen.tScreen.Show()
 }
 

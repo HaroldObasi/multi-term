@@ -40,9 +40,6 @@ func HandleInsertRune(screen *Screen, r rune) {
 	// figure out where the cursor is
 	// insert the rune at the cursor
 	tb := screen.tabBuffer
-
-	// lb := tb.lines[0]
-
 	cursor := tb.cursor
 	line := tb.lines[cursor.y]
 	line.Insert(r)
