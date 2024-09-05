@@ -36,8 +36,9 @@ func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
 	for _, c := range dat {
 		if c == '\n'{
 			tb.AddLine("")
+		} else {
+			tb.lines[tb.cursor.y].Insert(rune(c))
 		}
-		tb.lines[tb.cursor.y].Insert(rune(c))
 	}
 
 	screen.tScreen.Show()
