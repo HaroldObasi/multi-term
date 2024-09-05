@@ -7,11 +7,13 @@ type TabBuffer struct {
 	gapSize  int
 	cursor   *Cursor
 	screen   *Screen
+	file     *File
 }
 
 func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
 	lines := make([]*LineBuffer, gapSize)
 	cursor := &Cursor{0, 0, screen}
+	file := NewFile("test.txt")
 
 	newLine := NewGapBuffer(s, 10, screen, cursor)
 	lines[0] = newLine
@@ -19,14 +21,28 @@ func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
 	gapStart := 1
 	gapEnd := (gapStart + gapSize) - 1
 
-	return &TabBuffer{
+	tb := TabBuffer{
 		gapStart: gapStart,
 		gapSize:  gapSize,
 		gapEnd:   gapEnd,
 		lines:    lines,
 		cursor:   cursor,
 		screen:   screen,
+		file:     file,
 	}
+
+	dat := file.ReadFile()
+
+	for _, c := range dat {
+		if c == '\n'{
+			tb.AddLine("")
+		}
+		tb.lines[tb.cursor.y].Insert(rune(c))
+	}
+
+	screen.tScreen.Show()
+
+	return &tb
 }
 
 // func (tb *TabBuffer) String() string {

@@ -1,6 +1,8 @@
 package main
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"github.com/gdamore/tcell/v2"
+)
 
 type Screen struct {
 	tabBuffer *TabBuffer
@@ -26,6 +28,7 @@ func NewScreen() (*Screen, error) {
 	screen.tabBuffer = NewTabBuffer("", 10, screen)
 
 	screen.CreateDebugArea()
+
 	return screen, nil
 
 }
