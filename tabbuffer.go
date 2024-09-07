@@ -35,7 +35,9 @@ func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
 
 	for _, c := range dat {
 		if c == '\n'{
+			tb.lines[tb.cursor.y].Insert(rune(c))
 			tb.AddLine("")
+
 		} else {
 			tb.lines[tb.cursor.y].Insert(rune(c))
 		}
@@ -66,6 +68,13 @@ func (tb *TabBuffer) _Grow() {
 
 	tb.lines = newLines
 	tb.gapEnd = newGapEnd
+}
+
+func (tb *TabBuffer) GetValidLines() []*LineBuffer {
+	first := tb.lines[:tb.gapStart]
+	second := tb.lines[tb.gapEnd:]
+
+	return append(first, second...)
 }
 
 func (tb *TabBuffer) GoLeft() {
