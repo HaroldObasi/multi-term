@@ -41,7 +41,10 @@ func HandleEvents(screen *Screen) {
 }
 
 func HandleSave(screen *Screen) {
-	// tb := screen.tabBuffer
+	tb := screen.tabBuffer
+	tb.file.Save(tb)
+
+	screen.WriteDebug("File saved", 4)
 	// file := tb.file
 	// file.Save(tb)
 }

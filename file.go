@@ -1,6 +1,9 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 type File struct {
 	path string
@@ -20,4 +23,22 @@ func (f *File) ReadFile() []byte {
 	}
 
 	return (data)
+}
+
+func (f *File) Save(tb *TabBuffer) {
+	// read through all the lines in the tab buffer and add thier runes to a buffer array
+	// then write the buffer array to the file
+
+	validLines := tb.GetValidLines()
+
+	var buffer []byte
+
+	for _, line := range validLines {
+		runes := line.GetRunes()
+		buffer = append(buffer, []byte(runes)...)
+	}
+
+	tb.screen.WriteDebug(fmt.Sprintf("Final of buffer: %v", buffer), 3)
+
+	os.WriteFile(f.path, buffer, 0644)
 }
