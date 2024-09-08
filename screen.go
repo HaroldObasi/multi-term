@@ -33,6 +33,7 @@ func NewScreen() (*Screen, error) {
 
 }
 
+
 func (s *Screen) CreateDebugArea() {
 	style := tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorWhite)
 	sWidth, sHeight := s.tScreen.Size()

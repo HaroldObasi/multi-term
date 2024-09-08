@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -37,8 +36,6 @@ func (f *File) Save(tb *TabBuffer) {
 		runes := line.GetRunes()
 		buffer = append(buffer, []byte(runes)...)
 	}
-
-	tb.screen.WriteDebug(fmt.Sprintf("Final of buffer: %v", buffer), 3)
 
 	os.WriteFile(f.path, buffer, 0644)
 }
