@@ -111,16 +111,23 @@ func (lb *LineBuffer) Delete() {
 	lb.buffer[lb.gapStart-1] = 0
 	lb.gapStart --
 
+	width, _ := lb.screen.tScreen.Size()
+
 	// lb.screen.WriteDebug(fmt.Sprintf("Cursor: %v", lb.cursor.x), 3)
-	x := lb.cursor.x
+	x := lb.cursor.x - 1
 	if lb.gapEnd >= len(lb.buffer) - 1 {
 		lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, ' ', nil, tcell.StyleDefault)
 	} else {
-		lb.screen.WriteDebug(fmt.Sprintf("it: %v", lb.buffer[lb.gapEnd + 1:]), 2)
-		// iterate through the items after the buffer,
-		// print them from the user's index, all the way down
-		for _, r := range lb.buffer[lb.gapEnd + 1:]{
-			lb.screen.tScreen.SetContent(x-1, lb.cursor.y, r, nil, tcell.StyleDefault)
+		
+		// redraw the line from cursor position
+		gapSize := lb.GetGapSize()
+
+		for x <= width {
+			if x + gapSize >= len(lb.buffer) {
+				lb.screen.tScreen.SetContent(x, lb.cursor.y, ' ', nil, tcell.StyleDefault)
+			} else {
+				lb.screen.tScreen.SetContent(x, lb.cursor.y, lb.buffer[gapSize + x], nil, tcell.StyleDefault)
+			}
 			x++
 		}
 
