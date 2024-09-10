@@ -13,7 +13,6 @@ func NewFile(path string) *File {
 	return &file
 }
 
-
 func (f *File) ReadFile() []byte {
 	data, err := os.ReadFile(f.path)
 

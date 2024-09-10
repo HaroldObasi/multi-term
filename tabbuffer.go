@@ -34,7 +34,7 @@ func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
 	dat := file.ReadFile()
 
 	for _, c := range dat {
-		if c == '\n'{
+		if c == '\n' {
 			tb.lines[tb.cursor.y].Insert(rune(c))
 			tb.AddLine("")
 

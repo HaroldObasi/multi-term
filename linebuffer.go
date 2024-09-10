@@ -93,10 +93,11 @@ func (lb *LineBuffer) Insert(r rune) {
 	for _, r := range str[x:] {
 		lb.screen.tScreen.SetContent(x, lb.cursor.y, r, nil, tcell.StyleDefault)
 		x++
-	}	
+	}
 
 	lb.screen.tScreen.Show()
 }
+
 // 100045
 
 // 1_45 => _455 ??
@@ -109,24 +110,24 @@ func (lb *LineBuffer) Delete() {
 	lb.GoTo(lb.cursor.x)
 
 	lb.buffer[lb.gapStart-1] = 0
-	lb.gapStart --
+	lb.gapStart--
 
 	width, _ := lb.screen.tScreen.Size()
 
 	// lb.screen.WriteDebug(fmt.Sprintf("Cursor: %v", lb.cursor.x), 3)
 	x := lb.cursor.x - 1
-	if lb.gapEnd >= len(lb.buffer) - 1 {
+	if lb.gapEnd >= len(lb.buffer)-1 {
 		lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, ' ', nil, tcell.StyleDefault)
 	} else {
-		
+
 		// redraw the line from cursor position
 		gapSize := lb.GetGapSize()
 
 		for x <= width {
-			if x + gapSize >= len(lb.buffer) {
+			if x+gapSize >= len(lb.buffer) {
 				lb.screen.tScreen.SetContent(x, lb.cursor.y, ' ', nil, tcell.StyleDefault)
 			} else {
-				lb.screen.tScreen.SetContent(x, lb.cursor.y, lb.buffer[gapSize + x], nil, tcell.StyleDefault)
+				lb.screen.tScreen.SetContent(x, lb.cursor.y, lb.buffer[gapSize+x], nil, tcell.StyleDefault)
 			}
 			x++
 		}
@@ -175,7 +176,6 @@ func (lb *LineBuffer) GoRight() {
 	lb.gapEnd++
 }
 
-
 // Moves the gap to start at the specified position, so it is the same as the cursor position
 func (lb *LineBuffer) GoTo(pos int) {
 	// lb.screen.WriteDebug(fmt.Sprintf("Old gap start: %d, pos: %d", lb.gapStart, pos), 3)
@@ -183,7 +183,6 @@ func (lb *LineBuffer) GoTo(pos int) {
 	if pos < 0 || pos >= len(lb.buffer) {
 		return
 	}
-
 
 	if pos < lb.gapStart {
 		// loop till gapstart
