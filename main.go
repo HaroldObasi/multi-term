@@ -8,7 +8,8 @@ import (
 // This program just prints "Hello, World!".  Press ESC to exit.
 func main() {
 
-	screen, err := NewScreen()
+	argv := os.Args
+	screen, err := NewScreen(argv)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)

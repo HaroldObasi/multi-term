@@ -10,10 +10,15 @@ type TabBuffer struct {
 	file     *File
 }
 
-func NewTabBuffer(s string, gapSize int, screen *Screen) *TabBuffer {
+func NewTabBuffer(s string, gapSize int, screen *Screen, filename string) *TabBuffer {
 	lines := make([]*LineBuffer, gapSize)
 	cursor := &Cursor{0, 0, screen}
-	file := NewFile("test.txt")
+
+	if filename == "" {
+		filename = "test.txt"
+	}
+
+	file := NewFile(filename)
 
 	newLine := NewGapBuffer(s, 10, screen, cursor)
 	lines[0] = newLine

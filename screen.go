@@ -9,7 +9,7 @@ type Screen struct {
 	tScreen   tcell.Screen
 }
 
-func NewScreen() (*Screen, error) {
+func NewScreen(argv []string) (*Screen, error) {
 	s, err := tcell.NewScreen()
 	if err != nil {
 		return nil, err
@@ -25,7 +25,15 @@ func NewScreen() (*Screen, error) {
 	s.ShowCursor(0, 0)
 
 	screen := &Screen{tScreen: s}
-	screen.tabBuffer = NewTabBuffer("", 10, screen)
+	var filename string
+
+	if len(argv) > 1 {
+		filename = argv[1]
+	} else {
+		filename = ""
+	}
+
+	screen.tabBuffer = NewTabBuffer("", 10, screen, filename)
 
 	screen.CreateDebugArea()
 
