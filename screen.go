@@ -40,6 +40,7 @@ func NewScreen(argv []string) (*Screen, error) {
 
 	screen.CreateDebugArea(debugAreaHeght)
 	screen.CreateFileInfoArea(fileInfoAreaHeight)
+	screen.WriteFileName(filename, 0)
 
 	bounds := [4][2]int{
 		{0, fileInfoAreaHeight}, {width, fileInfoAreaHeight}, {0, height - debugAreaHeght}, {width, height - debugAreaHeght},
@@ -87,5 +88,18 @@ func (s *Screen) CreateFileInfoArea(height int) {
 			s.tScreen.SetContent(x, y, ' ', nil, style)
 		}
 	}
+	s.tScreen.Show()
+}
+
+func (s *Screen) WriteFileName(str string, row int) {
+	style := tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorWhite)
+	sWidth, _ := s.tScreen.Size()
+
+	lenStr := len(str)
+
+	for i, char := range str {
+		s.tScreen.SetContent(((sWidth / 2) - lenStr / 2) + i, row, char, nil, style)
+	}
+
 	s.tScreen.Show()
 }
