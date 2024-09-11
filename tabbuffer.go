@@ -14,9 +14,9 @@ type TabBuffer struct {
 func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds [4][2] int) *TabBuffer {
 	lines := make([]*LineBuffer, gapSize)
 
-	// upperBound := bounds[0][1]
+	upperBound := bounds[0][1]
 
-	cursor := NewCursor(0, 0, screen)
+	cursor := NewCursor(0, upperBound, screen)
 
 	if filename == "" {
 		filename = "test.txt"
@@ -66,6 +66,12 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds
 
 func (tb *TabBuffer) GetGapSize() int {
 	return (tb.gapEnd - tb.gapStart) + 1
+}
+
+func (tb *TabBuffer) GetLine(y int) *LineBuffer {
+	// get the upper bound of the screen
+	upperBound := tb.bounds[0][1]
+	return tb.lines[y - upperBound]
 }
 
 func (tb *TabBuffer) Grow() {
