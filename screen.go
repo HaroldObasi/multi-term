@@ -33,19 +33,31 @@ func NewScreen(argv []string) (*Screen, error) {
 		filename = ""
 	}
 
-	screen.tabBuffer = NewTabBuffer("", 10, screen, filename)
+	width, height := s.Size()
 
-	screen.CreateDebugArea()
+	debugAreaHeght := 5
+	fileInfoAreaHeight := 1
+
+	screen.CreateDebugArea(debugAreaHeght)
+	screen.CreateFileInfoArea(fileInfoAreaHeight)
+
+	bounds := [4][2]int{
+		{0, fileInfoAreaHeight}, {width, fileInfoAreaHeight}, {0, height - debugAreaHeght}, {width, height - debugAreaHeght},
+	}
+
+	screen.tabBuffer = NewTabBuffer("", 10, screen, filename, bounds)
+
 
 	return screen, nil
 
 }
 
-func (s *Screen) CreateDebugArea() {
+//creates the debug area at the bottom of the screen
+func (s *Screen) CreateDebugArea(height int) {
 	style := tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorWhite)
 	sWidth, sHeight := s.tScreen.Size()
 
-	for y := sHeight - 5; y < sHeight; y++ {
+	for y := sHeight - height; y < sHeight; y++ {
 		for x := 0; x < sWidth; x++ {
 			s.tScreen.SetContent(x, y, ' ', nil, style)
 		}
@@ -63,5 +75,17 @@ func (s *Screen) WriteDebug(str string, y int) {
 		s.tScreen.SetContent(i, (sHeight-startingPoint)+y, char, nil, style)
 	}
 
+	s.tScreen.Show()
+}
+
+func (s *Screen) CreateFileInfoArea(height int) {
+	style := tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorWhite)
+	sWidth, _ := s.tScreen.Size()
+
+	for y := 0; y < height; y++ {
+		for x := 0; x < sWidth; x++ {
+			s.tScreen.SetContent(x, y, ' ', nil, style)
+		}
+	}
 	s.tScreen.Show()
 }

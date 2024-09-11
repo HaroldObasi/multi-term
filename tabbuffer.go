@@ -5,14 +5,18 @@ type TabBuffer struct {
 	gapStart int
 	gapEnd   int
 	gapSize  int
+	bounds   [4][2]int
 	cursor   *Cursor
 	screen   *Screen
 	file     *File
 }
 
-func NewTabBuffer(s string, gapSize int, screen *Screen, filename string) *TabBuffer {
+func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds [4][2] int) *TabBuffer {
 	lines := make([]*LineBuffer, gapSize)
-	cursor := &Cursor{0, 0, screen}
+
+	// upperBound := bounds[0][1]
+
+	cursor := NewCursor(0, 0, screen)
 
 	if filename == "" {
 		filename = "test.txt"
@@ -34,8 +38,11 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string) *TabBu
 		cursor:   cursor,
 		screen:   screen,
 		file:     file,
+		bounds:   bounds,
 	}
 
+
+	// print file contents on screen initially
 	dat := file.ReadFile()
 
 	for _, c := range dat {
@@ -61,7 +68,7 @@ func (tb *TabBuffer) GetGapSize() int {
 	return (tb.gapEnd - tb.gapStart) + 1
 }
 
-func (tb *TabBuffer) _Grow() {
+func (tb *TabBuffer) Grow() {
 	newCapacity := tb.gapSize * 2
 	newLines := make([]*LineBuffer, newCapacity+len(tb.lines))
 
@@ -109,8 +116,7 @@ func (tb *TabBuffer) GoRight() {
 func (tb *TabBuffer) AddLine(s string) {
 	// tb.screen.WriteDebug("Adding line", 1)
 	if tb.GetGapSize() <= 1 {
-		tb.screen.WriteDebug("Growing", 1)
-		// tb._Grow()
+		tb.Grow()
 	}
 
 	line := NewGapBuffer(s, 10, tb.screen, tb.cursor)
