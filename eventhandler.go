@@ -54,14 +54,14 @@ func HandleInsertRune(screen *Screen, r rune) {
 	// insert the rune at the cursor
 	tb := screen.tabBuffer
 	cursor := tb.cursor
-	line := tb.lines[cursor.y]
+	line := tb.GetLine(cursor.y)
 	line.Insert(r)
 }
 
 func HandleBackspace(screen *Screen) {
 	tb := screen.tabBuffer
 	cursor := tb.cursor
-	line := tb.lines[cursor.y]
+	line := tb.GetLine(cursor.y)
 	line.Delete()
 }
 
@@ -69,7 +69,7 @@ func HandleReturn(screen *Screen) {
 	tb := screen.tabBuffer
 
 	cursor := tb.cursor
-	line := tb.lines[cursor.y]
+	line := tb.GetLine(cursor.y)
 	line.Insert('\n')
 
 	tb.AddLine("")
@@ -92,7 +92,8 @@ func HandleDirection(screen *Screen, key tcell.Key) {
 		cursor.SetPos(cursor.x-1, cursor.y)
 
 	case tcell.KeyRight:
-		if cursor.x < tb.lines[cursor.y].Len()-1 {
+		line := tb.GetLine(cursor.y)
+		if cursor.x < line.Len()-1 {
 			cursor.SetPos(cursor.x+1, cursor.y)
 		}
 	}

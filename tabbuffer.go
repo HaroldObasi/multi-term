@@ -47,11 +47,13 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds
 
 	for _, c := range dat {
 		if c == '\n' {
-			tb.lines[tb.cursor.y].Insert(rune(c))
+			line := tb.GetLine(tb.cursor.y)
+			line.Insert(rune(c))
 			tb.AddLine("")
 
 		} else {
-			tb.lines[tb.cursor.y].Insert(rune(c))
+			line := tb.GetLine(tb.cursor.y)
+			line.Insert(rune(c))
 		}
 	}
 
@@ -133,7 +135,7 @@ func (tb *TabBuffer) AddLine(s string) {
 }
 
 func (tb *TabBuffer) Write(char rune) {
-	selectedLine := tb.lines[tb.cursor.y]
+	selectedLine := tb.GetLine(tb.cursor.y)
 	selectedLine.GoTo(tb.cursor.x)
 	selectedLine.Insert(char)
 }
