@@ -13,6 +13,12 @@ func (c *Cursor) String() string {
 	return fmt.Sprintf("Cursor: (%v, %v)", c.x, c.y)
 }
 
+func NewCursor(x, y int, screen *Screen) *Cursor {
+	cursor := &Cursor{x, y, screen}
+	screen.tScreen.ShowCursor(cursor.x, cursor.y)
+	return cursor
+}
+
 // use this method to set the position of the cursor
 // dont directly change the x and y values
 func (c *Cursor) SetPos(x, y int) {
