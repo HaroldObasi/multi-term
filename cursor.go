@@ -22,14 +22,12 @@ func NewCursor(x, y int, screen *Screen) *Cursor {
 // use this method to set the position of the cursor
 // dont directly change the x and y values
 func (c *Cursor) SetPos(x, y int, tb *TabBuffer) {
-	sWidth, sHeight := c.screen.tScreen.Size()
+	sWidth, _ := c.screen.tScreen.Size()
 
-	// c.screen.WriteDebug(fmt.Sprintf("TabBuffer: %v", tabBuffer), 4)
+	upperBound := tb.bounds[0][1]
+	lowerBound := tb.bounds[2][1]
 
-	// upperBound := tb.bounds[0][1]
-	// lowerBound := tb.bounds[2][1]
-
-	// c.screen.WriteDebug(fmt.Sprintf("Upper Bound: %d, Lower Bound: %d", upperBound, lowerBound), 4)
+	c.screen.WriteDebug(fmt.Sprintf("Upper Bound: %d, Lower Bound: %d", upperBound, lowerBound), 4)
 
 	if x < 0 {
 		x = 0
@@ -37,10 +35,10 @@ func (c *Cursor) SetPos(x, y int, tb *TabBuffer) {
 		x = sWidth
 	}
 
-	if y < 0 {
-		y = 0
-	} else if y >= sHeight {
-		y = sHeight - 1
+	if y < upperBound {
+		y = upperBound
+	} else if y >= lowerBound {
+		y = lowerBound - 1
 	}
 
 	c.x = x
