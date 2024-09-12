@@ -130,7 +130,7 @@ func (tb *TabBuffer) AddLine(s string) {
 	line := NewGapBuffer(s, 10, tb.screen, tb.cursor)
 	tb.lines[tb.gapStart] = line
 
-	tb.cursor.SetPos(0, tb.cursor.y+1)
+	tb.cursor.SetPos(0, tb.cursor.y+1, tb)
 	tb.gapStart++
 }
 

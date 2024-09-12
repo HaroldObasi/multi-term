@@ -82,7 +82,7 @@ func (lb *LineBuffer) Insert(r rune) {
 	lb.buffer[lb.gapStart] = r
 
 	x := lb.gapStart
-	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y)
+	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y, lb.screen.tabBuffer)
 
 	lb.gapStart++
 
@@ -134,7 +134,7 @@ func (lb *LineBuffer) Delete() {
 
 	}
 
-	lb.cursor.SetPos(lb.cursor.x-1, lb.cursor.y)
+	lb.cursor.SetPos(lb.cursor.x-1, lb.cursor.y, lb.screen.tabBuffer)
 	lb.screen.tScreen.Show()
 }
 
