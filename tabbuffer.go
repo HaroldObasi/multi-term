@@ -40,10 +40,11 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds
 		file:     file,
 		bounds:   bounds,
 	}
+	return &tb
+}
 
-
-	// print file contents on screen initially
-	dat := file.ReadFile()
+func (tb *TabBuffer) WriteFileToScreen(){
+	dat := tb.file.ReadFile()
 
 	for _, c := range dat {
 		if c == '\n' {
@@ -57,9 +58,7 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds
 		}
 	}
 
-	screen.tScreen.Show()
-
-	return &tb
+	tb.screen.tScreen.Show()
 }
 
 // func (tb *TabBuffer) String() string {
