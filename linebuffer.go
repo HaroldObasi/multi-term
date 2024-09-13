@@ -204,34 +204,6 @@ func (lb *LineBuffer) GoTo(pos int) {
 
 }
 
-// deprecate this
-func (lb *LineBuffer) ChangeCursorPos(index int) {
-
-	// gap starts on cursor index
-
-	if index < 0 || index >= len(lb.buffer) {
-		return // Invalid index
-	}
-
-	gapSize := lb.GetGapSize()
-
-	if index < lb.gapStart {
-		// Move gap left
-		tmp := make([]rune, lb.gapStart-index)
-		copy(tmp, lb.buffer[index:lb.gapStart])
-		copy(lb.buffer[index:index+gapSize], lb.buffer[lb.gapStart:lb.gapEnd+1]) //good
-
-		lb.gapStart = index               //good
-		lb.gapEnd = (index + gapSize) - 1 //good
-
-		copy(lb.buffer[lb.gapEnd+1:(lb.gapEnd+1)+len(tmp)], tmp) // correct index on lside,
-
-	} else if index > lb.gapStart {
-
-	}
-
-}
-
 // returns the length of the buffer excluding the gap
 func (lb *LineBuffer) Len() int {
 	return len(lb.buffer) - lb.GetGapSize()

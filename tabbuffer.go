@@ -11,7 +11,7 @@ type TabBuffer struct {
 	file     *File
 }
 
-func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds [4][2] int) *TabBuffer {
+func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds [4][2]int) *TabBuffer {
 	lines := make([]*LineBuffer, gapSize)
 
 	upperBound := bounds[0][1]
@@ -43,7 +43,7 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds
 	return &tb
 }
 
-func (tb *TabBuffer) WriteFileToScreen(){
+func (tb *TabBuffer) WriteFileToScreen() {
 	dat := tb.file.ReadFile()
 
 	for _, c := range dat {
@@ -72,7 +72,7 @@ func (tb *TabBuffer) GetGapSize() int {
 func (tb *TabBuffer) GetLine(y int) *LineBuffer {
 	// get the upper bound of the screen
 	upperBound := tb.bounds[0][1]
-	return tb.lines[y - upperBound]
+	return tb.lines[y-upperBound]
 }
 
 func (tb *TabBuffer) Grow() {

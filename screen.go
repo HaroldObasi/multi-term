@@ -48,12 +48,11 @@ func NewScreen(argv []string) (*Screen, error) {
 
 	screen.tabBuffer = NewTabBuffer("", 10, screen, filename, bounds)
 
-
 	return screen, nil
 
 }
 
-//creates the debug area at the bottom of the screen
+// creates the debug area at the bottom of the screen
 func (s *Screen) CreateDebugArea(height int) {
 	style := tcell.StyleDefault.Foreground(tcell.ColorBlack).Background(tcell.ColorWhite)
 	sWidth, sHeight := s.tScreen.Size()
@@ -98,7 +97,7 @@ func (s *Screen) WriteFileName(str string, row int) {
 	lenStr := len(str)
 
 	for i, char := range str {
-		s.tScreen.SetContent(((sWidth / 2) - lenStr / 2) + i, row, char, nil, style)
+		s.tScreen.SetContent(((sWidth/2)-lenStr/2)+i, row, char, nil, style)
 	}
 
 	s.tScreen.Show()
