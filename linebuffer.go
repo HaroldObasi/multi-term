@@ -73,6 +73,20 @@ func (lb *LineBuffer) Write(s string) {
 
 }
 
+func (lb *LineBuffer) Add(b byte) {
+	if lb.GetGapSize() <= 1 {
+		lb.Grow()
+	}
+
+	lb.GoTo(lb.cursor.x)
+	lb.buffer[lb.gapStart] = rune(b)
+
+	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y, lb.screen.tabBuffer)
+
+	lb.gapStart++
+
+}
+
 func (lb *LineBuffer) Insert(r rune) {
 	if lb.GetGapSize() <= 1 {
 		lb.Grow()

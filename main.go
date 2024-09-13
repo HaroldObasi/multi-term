@@ -5,7 +5,6 @@ import (
 	"os"
 )
 
-// This program just prints "Hello, World!".  Press ESC to exit.
 func main() {
 
 	argv := os.Args

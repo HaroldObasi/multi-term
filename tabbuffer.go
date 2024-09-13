@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/gdamore/tcell/v2"
+)
+
 type TabBuffer struct {
 	lines    []*LineBuffer
 	gapStart int
@@ -43,18 +47,33 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds
 	return &tb
 }
 
+// adds the bytes from the read file to the buffers, without prn
+func (tb *TabBuffer) InsertBytes(bytes []byte) {
+	// split the file into different arrays. use the \n as a seperator
+	// arr := utils.SplitRuneArray(bytes, 10)
+}
+
 func (tb *TabBuffer) WriteFileToScreen() {
 	dat := tb.file.ReadFile()
 
+	y := 1
+	x := 0
+
 	for _, c := range dat {
 		if c == '\n' {
-			line := tb.GetLine(tb.cursor.y)
-			line.Insert(rune(c))
-			tb.AddLine("")
+			// line := tb.GetLine(tb.cursor.y)
+			// line.Insert(rune(c))
+			tb.screen.tScreen.SetContent(x, y, rune(c), nil, tcell.StyleDefault)
+			// tb.AddLine("")
+			y++
+			x = 0
 
 		} else {
-			line := tb.GetLine(tb.cursor.y)
-			line.Insert(rune(c))
+			tb.screen.tScreen.SetContent(x, y, rune(c), nil, tcell.StyleDefault)
+			x++
+
+			// line := tb.GetLine(tb.cursor.y)
+			// line.Insert(rune(c))
 		}
 	}
 
