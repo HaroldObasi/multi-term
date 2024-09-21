@@ -93,6 +93,8 @@ func (tb *TabBuffer) WriteFileToScreen() {
 			upperBound++
 			x = 0
 
+		} else if c == '\t' {
+			x += 4
 		} else {
 			tb.screen.tScreen.SetContent(x, upperBound, rune(c), nil, tcell.StyleDefault)
 			x++
