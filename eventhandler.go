@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/gdamore/tcell/v2"
@@ -30,6 +29,9 @@ func HandleEvents(screen *Screen) {
 			case tcell.KeyEnter:
 				HandleReturn(screen)
 
+			case tcell.KeyTab:
+				// HandleTab(screen)
+
 			case tcell.KeyRune:
 				ch := ev.Rune()
 				HandleInsertRune(screen, ch)
@@ -54,10 +56,8 @@ func HandleInsertRune(screen *Screen, r rune) {
 	tb := screen.tabBuffer
 	cursor := tb.cursor
 	line := tb.GetLine(cursor.y)
-
-	screen.WriteDebug(fmt.Sprintf("line %v", line.buffer), 3)
-	screen.WriteDebug(fmt.Sprintf("tb %v", tb.lines[0].buffer), 4)
-	// line.Insert(r)
+	
+	line.Insert(r)
 }
 
 func HandleBackspace(screen *Screen) {
@@ -67,12 +67,21 @@ func HandleBackspace(screen *Screen) {
 	line.Delete()
 }
 
+func HandleTab(screen *Screen) {
+
+	// TODO: implement tabbing
+	tb := screen.tabBuffer
+	cursor := tb.cursor
+	line := tb.GetLine(cursor.y)
+	line.Insert('\t')
+}
+
 func HandleReturn(screen *Screen) {
 	tb := screen.tabBuffer
 
-	cursor := tb.cursor
-	line := tb.GetLine(cursor.y)
-	line.Insert('\n')
+	// cursor := tb.cursor
+	// line := tb.GetLine(cursor.y)
+	// line.Insert('\n')
 
 	tb.AddLine("")
 }
@@ -95,7 +104,7 @@ func HandleDirection(screen *Screen, key tcell.Key) {
 
 	case tcell.KeyRight:
 		line := tb.GetLine(cursor.y)
-		if cursor.x < line.Len()-1 {
+		if cursor.x <= line.Len()-1 {
 			cursor.SetPos(cursor.x+1, cursor.y, tb)
 		}
 	}
