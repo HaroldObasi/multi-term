@@ -133,7 +133,7 @@ func (tb *TabBuffer) Grow() {
 
 func (tb *TabBuffer) GetValidLines() []*LineBuffer {
 	first := tb.lines[:tb.gapStart]
-	second := tb.lines[tb.gapEnd:]
+	second := tb.lines[tb.gapEnd+1 :]
 
 	return append(first, second...)
 }
