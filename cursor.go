@@ -27,8 +27,6 @@ func (c *Cursor) SetPos(x, y int, tb *TabBuffer) {
 	upperBound := tb.bounds[0][1]
 	lowerBound := tb.bounds[2][1]
 
-	c.screen.WriteDebug(fmt.Sprintf("Upper Bound: %d, Lower Bound: %d", upperBound, lowerBound), 4)
-
 	if x < 0 {
 		x = 0
 	} else if x > sWidth {
@@ -50,4 +48,5 @@ func (c *Cursor) SetPos(x, y int, tb *TabBuffer) {
 	// c.screen.WriteDebug(fmt.Sprintf("Item: %v, Width: %v", primary, width))
 
 	c.screen.WriteDebug(fmt.Sprintf("Col: %d, Row: %d", c.x, c.y), 0)
+	// c.screen.WriteDebug(fmt.Sprintf("buffer: %v ", c.screen.tabBuffer.lines[c.y].buffer), 1)
 }
