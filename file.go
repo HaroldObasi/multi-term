@@ -28,13 +28,15 @@ func (f *File) Save(tb *TabBuffer) {
 	// then write the buffer array to the file
 
 	validLines := tb.GetValidLines()
-
 	var buffer []byte
 
-	for _, line := range validLines {
+	for i, line := range validLines {
 		runes := line.GetRunes()
 		buffer = append(buffer, []byte(runes)...)
-	}
 
+		if i < len(validLines) - 1 {
+			buffer = append(buffer, 10)
+		}
+	}
 	os.WriteFile(f.path, buffer, 0644)
 }

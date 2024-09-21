@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gdamore/tcell/v2"
@@ -45,8 +46,6 @@ func HandleSave(screen *Screen) {
 	tb.file.Save(tb)
 
 	screen.WriteDebug("File saved", 4)
-	// file := tb.file
-	// file.Save(tb)
 }
 
 func HandleInsertRune(screen *Screen, r rune) {
@@ -55,7 +54,10 @@ func HandleInsertRune(screen *Screen, r rune) {
 	tb := screen.tabBuffer
 	cursor := tb.cursor
 	line := tb.GetLine(cursor.y)
-	line.Insert(r)
+
+	screen.WriteDebug(fmt.Sprintf("line %v", line.buffer), 3)
+	screen.WriteDebug(fmt.Sprintf("tb %v", tb.lines[0].buffer), 4)
+	// line.Insert(r)
 }
 
 func HandleBackspace(screen *Screen) {
