@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/HaroldObasi/multi-term/utils"
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -28,7 +31,7 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds
 
 	file := NewFile(filename)
 
-	newLine := NewGapBuffer(s, 10, screen, cursor)
+	newLine := NewLineBuffer(s, 10, screen, cursor)
 	lines[0] = newLine
 
 	gapStart := 1
@@ -47,36 +50,54 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds
 	return &tb
 }
 
-// adds the bytes from the read file to the buffers, without prn
-func (tb *TabBuffer) InsertBytes(bytes []byte) {
-	// split the file into different arrays. use the \n as a seperator
-	// arr := utils.SplitRuneArray(bytes, 10)
+func NewTabBufferFromFile(filename string, screen *Screen, bounds [4][2]int) *TabBuffer{
+	file := NewFile(filename)
+	dat := file.ReadFile()
+	arr := utils.SplitRuneArray([]rune(string(dat)), 10)
+
+	gapStart := len(arr)
+	gapSize := 10
+	gapEnd := (gapStart + gapSize) - 1
+
+	upperBound := bounds[0][1]
+	cursor := NewCursor(0, upperBound, screen)
+
+	lines := make([]*LineBuffer, len(arr) + gapSize)
+
+	for i := range arr {
+		lines[i] = NewLineBuffer(string(arr[i]), 10, screen, NewCursor(0, i, screen))
+	}
+
+	return &TabBuffer{
+		lines: lines,
+		gapStart: gapStart,
+		gapSize: gapSize,
+		gapEnd: gapEnd,
+		cursor: cursor,
+		screen: screen,
+		file: file,
+		bounds: bounds,
+	}
 }
+
 
 func (tb *TabBuffer) WriteFileToScreen() {
 	dat := tb.file.ReadFile()
 
-	y := 1
+	upperBound := tb.bounds[0][1]
 	x := 0
 
 	for _, c := range dat {
 		if c == '\n' {
-			// line := tb.GetLine(tb.cursor.y)
-			// line.Insert(rune(c))
-			tb.screen.tScreen.SetContent(x, y, rune(c), nil, tcell.StyleDefault)
-			// tb.AddLine("")
-			y++
+			tb.screen.tScreen.SetContent(x, upperBound, rune(c), nil, tcell.StyleDefault)
+			upperBound++
 			x = 0
 
 		} else {
-			tb.screen.tScreen.SetContent(x, y, rune(c), nil, tcell.StyleDefault)
+			tb.screen.tScreen.SetContent(x, upperBound, rune(c), nil, tcell.StyleDefault)
 			x++
-
-			// line := tb.GetLine(tb.cursor.y)
-			// line.Insert(rune(c))
 		}
 	}
-
 	tb.screen.tScreen.Show()
 }
 
@@ -90,7 +111,9 @@ func (tb *TabBuffer) GetGapSize() int {
 
 func (tb *TabBuffer) GetLine(y int) *LineBuffer {
 	// get the upper bound of the screen
+
 	upperBound := tb.bounds[0][1]
+	tb.screen.WriteDebug(fmt.Sprintf("Getting line %v", y-upperBound), 2)
 	return tb.lines[y-upperBound]
 }
 
@@ -145,7 +168,7 @@ func (tb *TabBuffer) AddLine(s string) {
 		tb.Grow()
 	}
 
-	line := NewGapBuffer(s, 10, tb.screen, tb.cursor)
+	line := NewLineBuffer(s, 10, tb.screen, tb.cursor)
 	tb.lines[tb.gapStart] = line
 
 	tb.cursor.SetPos(0, tb.cursor.y+1, tb)
