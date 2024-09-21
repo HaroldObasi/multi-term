@@ -20,7 +20,7 @@ func (lb *LineBuffer) String() string {
 	return fmt.Sprintf("Gap Start: %v, Gap End: %v, Buffer: %v", lb.gapStart, lb.gapEnd, lb.GetText())
 }
 
-func NewGapBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBuffer {
+func NewLineBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBuffer {
 
 	// screen.WriteDebug(fmt.Sprintf("Recieved cursr: %v", cursor.x))
 	// time.Sleep(3 * time.Second)
@@ -42,7 +42,7 @@ func NewGapBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBu
 		cursor:   cursor,
 	}
 
-	lb.Write(s)
+	// lb.Write(s)
 	return lb
 }
 
@@ -101,7 +101,6 @@ func (lb *LineBuffer) Insert(r rune) {
 	lb.gapStart++
 
 	str := lb.GetText()
-	lb.screen.WriteDebug(fmt.Sprint(lb.buffer), 1)
 
 	// iterate over the string from the gapstart to the end to update the screen
 	for _, r := range str[x:] {
