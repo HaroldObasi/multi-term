@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/HaroldObasi/multi-term/utils"
 	"github.com/gdamore/tcell/v2"
 )
@@ -65,8 +63,9 @@ func NewTabBufferFromFile(filename string, screen *Screen, bounds [4][2]int) *Ta
 	lines := make([]*LineBuffer, len(arr) + gapSize)
 
 	for i := range arr {
-		lines[i] = NewLineBuffer(string(arr[i]), 10, screen, NewCursor(0, i, screen))
+		lines[i] = NewLineBuffer(string(arr[i]), 10, screen, cursor)
 	}
+
 
 	return &TabBuffer{
 		lines: lines,
@@ -115,7 +114,6 @@ func (tb *TabBuffer) GetLine(y int) *LineBuffer {
 	// get the upper bound of the screen
 
 	upperBound := tb.bounds[0][1]
-	tb.screen.WriteDebug(fmt.Sprintf("Getting line %v", y-upperBound), 2)
 	return tb.lines[y-upperBound]
 }
 

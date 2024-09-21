@@ -103,6 +103,7 @@ func (lb *LineBuffer) Insert(r rune) {
 	str := lb.GetText()
 
 	// iterate over the string from the gapstart to the end to update the screen
+	// TODO: need to loop over bytes and not string
 	for _, r := range str[x:] {
 		lb.screen.tScreen.SetContent(x, lb.cursor.y, r, nil, tcell.StyleDefault)
 		x++

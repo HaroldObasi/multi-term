@@ -22,7 +22,6 @@ func NewScreen(argv []string) (*Screen, error) {
 		Background(tcell.ColorBlack).
 		Foreground(tcell.ColorWhite)
 	s.SetStyle(defStyle)
-	s.ShowCursor(0, 0)
 
 	screen := &Screen{tScreen: s}
 	var filename string
@@ -53,6 +52,8 @@ func NewScreen(argv []string) (*Screen, error) {
 	} else {
 		screen.tabBuffer = NewTabBufferFromFile(filename, screen, bounds)
 	}
+
+	// screen.tabBuffer.cursor.SetPos(0, bounds[0][1], screen.tabBuffer)
 
 	return screen, nil
 

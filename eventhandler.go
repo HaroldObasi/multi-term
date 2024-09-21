@@ -92,11 +92,25 @@ func HandleDirection(screen *Screen, key tcell.Key) {
 
 	switch key {
 	case tcell.KeyUp:
-		cursor.SetPos(cursor.x, cursor.y-1, tb)
+		upperBound := tb.bounds[0][1]
+
+		if cursor.y > upperBound {
+			prevLine := tb.GetLine(cursor.y - 1)
+			if cursor.x > prevLine.Len()-1 {
+				cursor.SetPos(prevLine.Len(), cursor.y-1, tb)
+			} else {
+				cursor.SetPos(cursor.x, cursor.y-1, tb)
+			}
+		}
 
 	case tcell.KeyDown:
 		if cursor.y < tb.Len() {
-			cursor.SetPos(cursor.x, cursor.y+1, tb)
+			nextLine := tb.GetLine(cursor.y + 1)
+			if cursor.x > nextLine.Len()-1 {
+				cursor.SetPos(nextLine.Len(), cursor.y+1, tb)
+			} else {
+				cursor.SetPos(cursor.x, cursor.y+1, tb)
+			}
 		}
 
 	case tcell.KeyLeft:
