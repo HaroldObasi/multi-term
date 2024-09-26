@@ -17,7 +17,7 @@ type LineBuffer struct {
 }
 
 func (lb *LineBuffer) String() string {
-	return fmt.Sprintf("Gap Start: %v, Gap End: %v, Buffer: %v", lb.gapStart, lb.gapEnd, lb.GetText())
+	return fmt.Sprintf("Gs: %v, Ge: %v, b: %v", lb.gapStart, lb.gapEnd, lb.buffer)
 }
 
 func NewLineBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBuffer {
