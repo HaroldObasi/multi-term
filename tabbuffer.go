@@ -192,6 +192,9 @@ func (tb *TabBuffer) AddLine(s string, y int, x int) {
 	tb.cursor.SetPos(0, tb.cursor.y+1, tb)
 	tb.lines[tb.gapStart] = line
 	tb.gapStart++
+
+	currentLine.ReDraw(x, y)
+	// tb.ReDraw(y)
 }
 
 func (tb *TabBuffer) Write(char rune) {

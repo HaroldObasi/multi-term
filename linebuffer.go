@@ -45,6 +45,25 @@ func NewLineBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineB
 	return lb
 }
 
+// redraws the line on the screen at the specified position
+func (lb *LineBuffer) ReDraw(x, y int) {
+	//buffer : [1, 2, 0, 0, 0] str: "12"
+	//specified position is 1
+
+	// from 1 to the width of the screen
+	str := lb.GetText()
+	width, _ := lb.screen.tScreen.Size()
+
+	for ; x < width; x++ {
+		if x >= len(str) {
+			lb.screen.tScreen.SetContent(x, y, ' ', nil, tcell.StyleDefault)
+		} else {
+			lb.screen.tScreen.SetContent(x, y, rune(str[x]), nil, tcell.StyleDefault)
+		}
+	}
+	lb.screen.tScreen.Show()
+}
+
 func (lb *LineBuffer) GetGapSize() int {
 	return (lb.gapEnd - lb.gapStart) + 1
 }
