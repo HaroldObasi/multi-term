@@ -72,7 +72,7 @@ func NewTabBufferFromFile(filename string, screen *Screen, bounds [4][2]int) *Ta
 	} else {
 		gapStart = 1
 		gapSize = 10
-		gapEnd = (gapStart + gapSize) - 1
+		gapEnd = gapSize - 1
 
 		lines = make([]*LineBuffer, gapSize)
 		lines[0] = NewLineBuffer("", 10, screen, cursor)
@@ -147,7 +147,6 @@ func (tb *TabBuffer) GetValidLines() []*LineBuffer {
 	first := tb.lines[:tb.gapStart]
 	second := tb.lines[tb.gapEnd + 1:]
 	
-
 	return append(first, second...)
 }
 
