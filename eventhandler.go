@@ -103,7 +103,8 @@ func HandleDirection(screen *Screen, key tcell.Key) {
 				cursor.SetPos(cursor.x, cursor.y-1, tb)
 			}
 		}
-
+	
+	// TODO: noticed when i open a file with more than 20 lines, i cannot scroll down below line 20
 	case tcell.KeyDown:
 		if cursor.y < tb.Len() {
 			nextLine := tb.GetLine(cursor.y + 1)
