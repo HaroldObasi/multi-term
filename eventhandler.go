@@ -80,11 +80,11 @@ func HandleTab(screen *Screen) {
 func HandleReturn(screen *Screen) {
 	tb := screen.tabBuffer
 
-	// cursor := tb.cursor
+	cursor := tb.cursor
 	// line := tb.GetLine(cursor.y)
 	// line.Insert('\n')
 
-	tb.AddLine("")
+	tb.AddLine("", cursor.y, cursor.x)
 }
 
 func HandleDirection(screen *Screen, key tcell.Key) {
