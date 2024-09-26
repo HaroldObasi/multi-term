@@ -174,16 +174,23 @@ func (tb *TabBuffer) GoRight() {
 	tb.gapEnd++
 }
 
-func (tb *TabBuffer) AddLine(s string) {
+func (tb *TabBuffer) AddLine(s string, y int, x int) {
 	// tb.screen.WriteDebug("Adding line", 1)
 	if tb.GetGapSize() <= 1 {
 		tb.Grow()
 	}
 
-	line := NewLineBuffer(s, 10, tb.screen, tb.cursor)
-	tb.lines[tb.gapStart] = line
+	currentLine := tb.GetLine(y)
+	currentLine.GoTo(x)
 
+	itemsAfterCursor := currentLine.buffer[currentLine.gapEnd + 1:]
+	line := NewLineBuffer(string(itemsAfterCursor), 10, tb.screen, tb.cursor)
+
+	copy(currentLine.buffer[currentLine.gapEnd + 1:], make([]rune, len(currentLine.buffer) - len(itemsAfterCursor)))
+	currentLine.gapEnd = len(currentLine.buffer) - 1
+	
 	tb.cursor.SetPos(0, tb.cursor.y+1, tb)
+	tb.lines[tb.gapStart] = line
 	tb.gapStart++
 }
 

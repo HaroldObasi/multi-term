@@ -22,8 +22,7 @@ func (lb *LineBuffer) String() string {
 
 func NewLineBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBuffer {
 
-	// screen.WriteDebug(fmt.Sprintf("Recieved cursr: %v", cursor.x))
-	// time.Sleep(3 * time.Second)
+	//TODO make sure this accepts an array of runes instead of a string
 
 	runes := []rune(s)
 	buffer := make([]rune, gapSize+len(runes))
