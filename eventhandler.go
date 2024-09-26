@@ -56,6 +56,7 @@ func HandleInsertRune(screen *Screen, r rune) {
 	tb := screen.tabBuffer
 	cursor := tb.cursor
 	line := tb.GetLine(cursor.y)
+
 	
 	line.Insert(r)
 }
