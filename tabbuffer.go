@@ -53,17 +53,29 @@ func NewTabBufferFromFile(filename string, screen *Screen, bounds [4][2]int) *Ta
 	dat := file.ReadFile()
 	arr := utils.SplitRuneArray([]rune(string(dat)), 10)
 
-	gapStart := len(arr)
-	gapSize := 10
-	gapEnd := (gapStart + gapSize) - 1
+	var gapStart, gapEnd, gapSize int
+	var lines []*LineBuffer
 
 	upperBound := bounds[0][1]
 	cursor := NewCursor(0, upperBound, screen)
 
-	lines := make([]*LineBuffer, len(arr) + gapSize)
+	
+	if len(arr) > 0 {
+		gapStart = len(arr)
+		gapSize = 10
+		gapEnd = (gapStart + gapSize) - 1
 
-	for i := range arr {
-		lines[i] = NewLineBuffer(string(arr[i]), 10, screen, cursor)
+		lines = make([]*LineBuffer, len(arr) + gapSize)
+		for i := range arr {
+			lines[i] = NewLineBuffer(string(arr[i]), 10, screen, cursor)
+		}
+	} else {
+		gapStart = 1
+		gapSize = 10
+		gapEnd = (gapStart + gapSize) - 1
+
+		lines = make([]*LineBuffer, gapSize)
+		lines[0] = NewLineBuffer("", 10, screen, cursor)
 	}
 
 
@@ -133,7 +145,8 @@ func (tb *TabBuffer) Grow() {
 
 func (tb *TabBuffer) GetValidLines() []*LineBuffer {
 	first := tb.lines[:tb.gapStart]
-	second := tb.lines[tb.gapEnd+1 :]
+	second := tb.lines[tb.gapEnd + 1:]
+	
 
 	return append(first, second...)
 }
