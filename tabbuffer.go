@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/HaroldObasi/multi-term/utils"
 	"github.com/gdamore/tcell/v2"
 )
@@ -122,6 +124,14 @@ func (tb *TabBuffer) GetGapSize() int {
 	return (tb.gapEnd - tb.gapStart) + 1
 }
 
+func (tb *TabBuffer) GetUpperBound() int {
+	return tb.bounds[0][1]
+}
+
+func (tb *TabBuffer) GetLowerBound() int {
+	return tb.bounds[2][1]
+}
+
 func (tb *TabBuffer) GetLine(y int) *LineBuffer {
 	// get the upper bound of the screen
 
@@ -194,7 +204,26 @@ func (tb *TabBuffer) AddLine(s string, y int, x int) {
 	tb.gapStart++
 
 	currentLine.ReDraw(x, y)
-	// tb.ReDraw(y)
+	tb.screen.WriteDebug(fmt.Sprintf("redraw from %v", y), 3)
+	
+	tb.ReDraw(y)
+}
+
+func (tb *TabBuffer) ReDraw(y int) {
+	posY :=  y + tb.GetUpperBound() //2
+
+	validLines := tb.GetValidLines()
+	linesToRedraw := validLines[y:] // account for the upper bound, change this whole uppoerbound logic later
+
+	tb.screen.WriteDebug(fmt.Sprintf("lines to redraw: %v", linesToRedraw), 2)
+
+	// tb.screen.WriteDebug(fmt.Sprintf("lines to redraw: %v", ), 2)
+
+	for count := 0; count < len(linesToRedraw); count++ {
+		tb.screen.WriteDebug(fmt.Sprintf("redrawing: %v", linesToRedraw[count]), 3)
+		linesToRedraw[count].ReDraw(0, posY)
+		posY++
+	}
 }
 
 func (tb *TabBuffer) Write(char rune) {
