@@ -164,17 +164,20 @@ func (tb *TabBuffer) GoTo(pos int) {
 
 	if pos < tb.gapStart {
 		diff := tb.gapStart - pos
+		tb.screen.WriteDebug(fmt.Sprintf("moved: %v", diff), 3)
 
 		for i := 0; i < diff; i++ {
 			tb.GoLeft()
 		}
 	} else if pos > tb.gapStart {
 		diff := pos - tb.gapStart
+		tb.screen.WriteDebug(fmt.Sprintf("moved: %v", diff), 3)
 
 		for i := 0; i < diff; i++ {
 			tb.GoRight()
 		}
 	}
+
 }
 
 func (tb *TabBuffer) GoLeft() {
@@ -207,11 +210,14 @@ func (tb *TabBuffer) AddLine(s string, y int, x int) {
 	if tb.GetGapSize() <= 1 {
 		tb.Grow()
 	}
+	bufferY := y - tb.GetUpperBound()
 
 	tb.screen.WriteDebug(fmt.Sprintf("init buf: %v. gs: %v, ge: %v", tb.lines, tb.gapStart, tb.gapEnd), 1)
 
 	//buffer handling
 	// first go to position
+	tb.GoTo(bufferY)
+	tb.screen.WriteDebug(fmt.Sprintf("stge 1 buf: %v. gs: %v, ge: %v", tb.lines, tb.gapStart, tb.gapEnd), 2)
 
 }
 
