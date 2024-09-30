@@ -50,7 +50,7 @@ func NewTabBuffer(s string, gapSize int, screen *Screen, filename string, bounds
 	return &tb
 }
 
-func NewTabBufferFromFile(filename string, screen *Screen, bounds [4][2]int) *TabBuffer{
+func NewTabBufferFromFile(filename string, screen *Screen, bounds [4][2]int) *TabBuffer {
 	file := NewFile(filename)
 	dat := file.ReadFile()
 	arr := utils.SplitRuneArray([]rune(string(dat)), 10)
@@ -61,13 +61,12 @@ func NewTabBufferFromFile(filename string, screen *Screen, bounds [4][2]int) *Ta
 	upperBound := bounds[0][1]
 	cursor := NewCursor(0, upperBound, screen)
 
-	
 	if len(arr) > 0 {
 		gapStart = len(arr)
 		gapSize = 10
 		gapEnd = (gapStart + gapSize) - 1
 
-		lines = make([]*LineBuffer, len(arr) + gapSize)
+		lines = make([]*LineBuffer, len(arr)+gapSize)
 		for i := range arr {
 			lines[i] = NewLineBuffer(string(arr[i]), 10, screen, cursor)
 		}
@@ -80,19 +79,17 @@ func NewTabBufferFromFile(filename string, screen *Screen, bounds [4][2]int) *Ta
 		lines[0] = NewLineBuffer("", 10, screen, cursor)
 	}
 
-
 	return &TabBuffer{
-		lines: lines,
+		lines:    lines,
 		gapStart: gapStart,
-		gapSize: gapSize,
-		gapEnd: gapEnd,
-		cursor: cursor,
-		screen: screen,
-		file: file,
-		bounds: bounds,
+		gapSize:  gapSize,
+		gapEnd:   gapEnd,
+		cursor:   cursor,
+		screen:   screen,
+		file:     file,
+		bounds:   bounds,
 	}
 }
-
 
 func (tb *TabBuffer) WriteFileToScreen() {
 	dat := tb.file.ReadFile()
@@ -155,9 +152,29 @@ func (tb *TabBuffer) Grow() {
 
 func (tb *TabBuffer) GetValidLines() []*LineBuffer {
 	first := tb.lines[:tb.gapStart]
-	second := tb.lines[tb.gapEnd + 1:]
-	
+	second := tb.lines[tb.gapEnd+1:]
+
 	return append(first, second...)
+}
+
+func (tb *TabBuffer) GoTo(pos int) {
+	if pos < 0 || pos >= len(tb.lines) {
+		return
+	}
+
+	if pos < tb.gapStart {
+		diff := tb.gapStart - pos
+
+		for i := 0; i < diff; i++ {
+			tb.GoLeft()
+		}
+	} else if pos > tb.gapStart {
+		diff := pos - tb.gapStart
+
+		for i := 0; i < diff; i++ {
+			tb.GoRight()
+		}
+	}
 }
 
 func (tb *TabBuffer) GoLeft() {
@@ -185,42 +202,28 @@ func (tb *TabBuffer) GoRight() {
 }
 
 func (tb *TabBuffer) AddLine(s string, y int, x int) {
+
 	// tb.screen.WriteDebug("Adding line", 1)
 	if tb.GetGapSize() <= 1 {
 		tb.Grow()
 	}
 
-	currentLine := tb.GetLine(y)
-	currentLine.GoTo(x)
+	tb.screen.WriteDebug(fmt.Sprintf("init buf: %v. gs: %v, ge: %v", tb.lines, tb.gapStart, tb.gapEnd), 1)
 
-	itemsAfterCursor := currentLine.buffer[currentLine.gapEnd + 1:]
-	line := NewLineBuffer(string(itemsAfterCursor), 10, tb.screen, tb.cursor)
+	//buffer handling
+	// first go to position
 
-	copy(currentLine.buffer[currentLine.gapEnd + 1:], make([]rune, len(currentLine.buffer) - len(itemsAfterCursor)))
-	currentLine.gapEnd = len(currentLine.buffer) - 1
-	
-	tb.cursor.SetPos(0, tb.cursor.y+1, tb)
-	tb.lines[tb.gapStart] = line
-	tb.gapStart++
-
-	currentLine.ReDraw(x, y)
-	tb.screen.WriteDebug(fmt.Sprintf("redraw from %v", y), 3)
-	
-	tb.ReDraw(y)
 }
 
 func (tb *TabBuffer) ReDraw(y int) {
-	posY :=  y + tb.GetUpperBound() //2
+	posY := y + tb.GetUpperBound() //2
 
 	validLines := tb.GetValidLines()
 	linesToRedraw := validLines[y:] // account for the upper bound, change this whole uppoerbound logic later
 
-	tb.screen.WriteDebug(fmt.Sprintf("lines to redraw: %v", linesToRedraw), 2)
-
 	// tb.screen.WriteDebug(fmt.Sprintf("lines to redraw: %v", ), 2)
 
 	for count := 0; count < len(linesToRedraw); count++ {
-		tb.screen.WriteDebug(fmt.Sprintf("redrawing: %v", linesToRedraw[count]), 3)
 		linesToRedraw[count].ReDraw(0, posY)
 		posY++
 	}
