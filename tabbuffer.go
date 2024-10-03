@@ -164,14 +164,12 @@ func (tb *TabBuffer) GoTo(pos int) {
 
 	if pos < tb.gapStart {
 		diff := tb.gapStart - pos
-		tb.screen.WriteDebug(fmt.Sprintf("moved: %v", diff), 3)
 
 		for i := 0; i < diff; i++ {
 			tb.GoLeft()
 		}
 	} else if pos > tb.gapStart {
 		diff := pos - tb.gapStart
-		tb.screen.WriteDebug(fmt.Sprintf("moved: %v", diff), 3)
 
 		for i := 0; i < diff; i++ {
 			tb.GoRight()
@@ -188,7 +186,7 @@ func (tb *TabBuffer) GoLeft() {
 	tb.lines[tb.gapEnd] = tb.lines[tb.gapStart-1]
 	tb.gapEnd--
 
-	tb.lines[tb.gapStart] = &LineBuffer{}
+	tb.lines[tb.gapStart - 1] = &LineBuffer{}
 	tb.gapStart--
 }
 
@@ -212,26 +210,51 @@ func (tb *TabBuffer) AddLine(s string, y int, x int) {
 	}
 	bufferY := y - tb.GetUpperBound()
 
-	tb.screen.WriteDebug(fmt.Sprintf("init buf: %v. gs: %v, ge: %v", tb.lines, tb.gapStart, tb.gapEnd), 1)
+	// get current line
+	currentLine := tb.GetLine(y)
 
-	//buffer handling
-	// first go to position
-	tb.GoTo(bufferY)
-	tb.screen.WriteDebug(fmt.Sprintf("stge 1 buf: %v. gs: %v, ge: %v", tb.lines, tb.gapStart, tb.gapEnd), 2)
+	currentLine.GoTo(x)
+
+	// get all the text on current line from x to end
+	carryOverText := currentLine.buffer[currentLine.gapEnd+1:]
+
+	//create new line with carryover text:
+	newLine := NewLineBuffer(string(carryOverText), 10, tb.screen, tb.cursor)
+	
+	// delete all the text on current line from x to end, and update current line gapend
+	copy(currentLine.buffer[x:], make([]rune, len(currentLine.buffer[x:])))
+	currentLine.gapEnd = len(currentLine.buffer) - 1
+
+	// go to postiton below line
+	tb.GoTo(bufferY + 1)
+
+	//add new line to tb.gapStart
+	tb.lines[tb.gapStart] = newLine
+	tb.gapStart++
+
+	// redraw the current line
+	currentLine.ReDraw(x, y)
+
+	// redraw the screen from y down
+	tb.ReDraw(y + 1)
+
+	tb.cursor.SetPos(0, y+1, tb)
 
 }
 
 func (tb *TabBuffer) ReDraw(y int) {
-	posY := y + tb.GetUpperBound() //2
+	displayY := y
+	bufferY := y - tb.GetUpperBound()
 
 	validLines := tb.GetValidLines()
-	linesToRedraw := validLines[y:] // account for the upper bound, change this whole uppoerbound logic later
-
-	// tb.screen.WriteDebug(fmt.Sprintf("lines to redraw: %v", ), 2)
+	linesToRedraw := validLines[bufferY:] // account for the upper bound, change this whole upperbound logic later
 
 	for count := 0; count < len(linesToRedraw); count++ {
-		linesToRedraw[count].ReDraw(0, posY)
-		posY++
+		tb.screen.WriteDebug(fmt.Sprintf("ui line: %v", displayY), 2)
+
+		tb.lines[bufferY].ReDraw(0, displayY)
+		bufferY++
+		displayY++
 	}
 }
 

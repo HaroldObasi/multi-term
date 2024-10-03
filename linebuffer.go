@@ -17,7 +17,7 @@ type LineBuffer struct {
 }
 
 func (lb *LineBuffer) String() string {
-	return fmt.Sprintf("Gs: %v, Ge: %v, b: %v", lb.gapStart, lb.gapEnd, lb.buffer)
+	return fmt.Sprintf("Gs: %v, Ge: %v, len: %v", lb.gapStart, lb.gapEnd, lb.GetText())
 }
 
 func NewLineBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBuffer {
@@ -51,6 +51,8 @@ func (lb *LineBuffer) ReDraw(x, y int) {
 	//specified position is 1
 
 	// from 1 to the width of the screen
+	lb.screen.WriteDebug(fmt.Sprintf("Redrawing line at %d, %d", x, y), 1)
+
 	str := lb.GetText()
 	width, _ := lb.screen.tScreen.Size()
 
