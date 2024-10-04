@@ -9,6 +9,17 @@ type File struct {
 }
 
 func NewFile(path string) *File {
+
+	//if file doesnt exist create file
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		file, err := os.Create(path)
+		if err != nil {
+			panic(err)
+		}
+		file.Close()
+	}
+	
+
 	file := File{path: path}
 	return &file
 }
