@@ -22,7 +22,6 @@ func NewScreen(argv []string) (*Screen, error) {
 		Background(tcell.ColorBlack).
 		Foreground(tcell.ColorWhite)
 	s.SetStyle(defStyle)
-	s.ShowCursor(0, 0)
 
 	screen := &Screen{tScreen: s}
 	var filename string
@@ -33,20 +32,28 @@ func NewScreen(argv []string) (*Screen, error) {
 		filename = ""
 	}
 
-	width, height := s.Size()
-
+	
 	debugAreaHeght := 5
 	fileInfoAreaHeight := 1
-
+	
 	screen.CreateDebugArea(debugAreaHeght)
 	screen.CreateFileInfoArea(fileInfoAreaHeight)
 	screen.WriteFileName(filename, 0)
+	
+	width, height := s.Size()
 
 	bounds := [4][2]int{
 		{0, fileInfoAreaHeight}, {width, fileInfoAreaHeight}, {0, height - debugAreaHeght}, {width, height - debugAreaHeght},
 	}
 
-	screen.tabBuffer = NewTabBuffer("", 10, screen, filename, bounds)
+
+	if filename == "" {
+		screen.tabBuffer = NewTabBuffer("", 10, screen, filename, bounds)
+	} else {
+		screen.tabBuffer = NewTabBufferFromFile(filename, screen, bounds)
+	}
+
+	// screen.tabBuffer.cursor.SetPos(0, bounds[0][1], screen.tabBuffer)
 
 	return screen, nil
 

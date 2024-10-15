@@ -29,6 +29,9 @@ func HandleEvents(screen *Screen) {
 			case tcell.KeyEnter:
 				HandleReturn(screen)
 
+			case tcell.KeyTab:
+				// HandleTab(screen)
+
 			case tcell.KeyRune:
 				ch := ev.Rune()
 				HandleInsertRune(screen, ch)
@@ -45,8 +48,6 @@ func HandleSave(screen *Screen) {
 	tb.file.Save(tb)
 
 	screen.WriteDebug("File saved", 4)
-	// file := tb.file
-	// file.Save(tb)
 }
 
 func HandleInsertRune(screen *Screen, r rune) {
@@ -55,6 +56,8 @@ func HandleInsertRune(screen *Screen, r rune) {
 	tb := screen.tabBuffer
 	cursor := tb.cursor
 	line := tb.GetLine(cursor.y)
+
+	
 	line.Insert(r)
 }
 
@@ -65,14 +68,23 @@ func HandleBackspace(screen *Screen) {
 	line.Delete()
 }
 
+func HandleTab(screen *Screen) {
+
+	// TODO: implement tabbing
+	tb := screen.tabBuffer
+	cursor := tb.cursor
+	line := tb.GetLine(cursor.y)
+	line.Insert('\t')
+}
+
 func HandleReturn(screen *Screen) {
 	tb := screen.tabBuffer
 
 	cursor := tb.cursor
-	line := tb.GetLine(cursor.y)
-	line.Insert('\n')
+	// line := tb.GetLine(cursor.y)
+	// line.Insert('\n')
 
-	tb.AddLine("")
+	tb.AddLine("", cursor.y, cursor.x)
 }
 
 func HandleDirection(screen *Screen, key tcell.Key) {
@@ -81,11 +93,26 @@ func HandleDirection(screen *Screen, key tcell.Key) {
 
 	switch key {
 	case tcell.KeyUp:
-		cursor.SetPos(cursor.x, cursor.y-1, tb)
+		upperBound := tb.bounds[0][1]
 
+		if cursor.y > upperBound {
+			prevLine := tb.GetLine(cursor.y - 1)
+			if cursor.x > prevLine.Len()-1 {
+				cursor.SetPos(prevLine.Len(), cursor.y-1, tb)
+			} else {
+				cursor.SetPos(cursor.x, cursor.y-1, tb)
+			}
+		}
+	
+	// TODO: noticed when i open a file with more than 20 lines, i cannot scroll down below line 20
 	case tcell.KeyDown:
 		if cursor.y < tb.Len() {
-			cursor.SetPos(cursor.x, cursor.y+1, tb)
+			nextLine := tb.GetLine(cursor.y + 1)
+			if cursor.x > nextLine.Len()-1 {
+				cursor.SetPos(nextLine.Len(), cursor.y+1, tb)
+			} else {
+				cursor.SetPos(cursor.x, cursor.y+1, tb)
+			}
 		}
 
 	case tcell.KeyLeft:
@@ -93,7 +120,7 @@ func HandleDirection(screen *Screen, key tcell.Key) {
 
 	case tcell.KeyRight:
 		line := tb.GetLine(cursor.y)
-		if cursor.x < line.Len()-1 {
+		if cursor.x <= line.Len()-1 {
 			cursor.SetPos(cursor.x+1, cursor.y, tb)
 		}
 	}

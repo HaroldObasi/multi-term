@@ -17,13 +17,12 @@ type LineBuffer struct {
 }
 
 func (lb *LineBuffer) String() string {
-	return fmt.Sprintf("Gap Start: %v, Gap End: %v, Buffer: %v", lb.gapStart, lb.gapEnd, lb.GetText())
+	return fmt.Sprintf("Gs: %v, Ge: %v, len: %v", lb.gapStart, lb.gapEnd, lb.GetText())
 }
 
-func NewGapBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBuffer {
+func NewLineBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBuffer {
 
-	// screen.WriteDebug(fmt.Sprintf("Recieved cursr: %v", cursor.x))
-	// time.Sleep(3 * time.Second)
+	//TODO make sure this accepts an array of runes instead of a string
 
 	runes := []rune(s)
 	buffer := make([]rune, gapSize+len(runes))
@@ -42,8 +41,29 @@ func NewGapBuffer(s string, gapSize int, screen *Screen, cursor *Cursor) *LineBu
 		cursor:   cursor,
 	}
 
-	lb.Write(s)
+	// lb.Write(s)
 	return lb
+}
+
+// redraws the line on the screen at the specified position
+func (lb *LineBuffer) ReDraw(x, y int) {
+	//buffer : [1, 2, 0, 0, 0] str: "12"
+	//specified position is 1
+
+	// from 1 to the width of the screen
+	lb.screen.WriteDebug(fmt.Sprintf("Redrawing line at %d, %d", x, y), 1)
+
+	str := lb.GetText()
+	width, _ := lb.screen.tScreen.Size()
+
+	for ; x < width; x++ {
+		if x >= len(str) {
+			lb.screen.tScreen.SetContent(x, y, ' ', nil, tcell.StyleDefault)
+		} else {
+			lb.screen.tScreen.SetContent(x, y, rune(str[x]), nil, tcell.StyleDefault)
+		}
+	}
+	lb.screen.tScreen.Show()
 }
 
 func (lb *LineBuffer) GetGapSize() int {
@@ -101,9 +121,9 @@ func (lb *LineBuffer) Insert(r rune) {
 	lb.gapStart++
 
 	str := lb.GetText()
-	lb.screen.WriteDebug(fmt.Sprint(lb.buffer), 1)
 
 	// iterate over the string from the gapstart to the end to update the screen
+	// TODO: need to loop over bytes and not string
 	for _, r := range str[x:] {
 		lb.screen.tScreen.SetContent(x, lb.cursor.y, r, nil, tcell.StyleDefault)
 		x++
