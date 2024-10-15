@@ -4,13 +4,15 @@ Multi-Term is a simple text editor built in Go. It aims to provide a lightweight
 
 ![Screenshot](media/ss1.png)
 
-## Usage
-To use, pull the repository
+## Installation and usage
+To use, pull the repository, and build
 
 ```sh
 git clone https://github.com/HaroldObasi/multi-term.git
 cd multi-term
-go run . file.txt
+go build
+sudo mv multi-term /usr/local/bin
+multi-term file.txt
 ```
 
 if file.txt doesn't exist it will be created on the level the command is being ran
@@ -28,10 +30,6 @@ Ctrl + S to Save, Esc to quit app
 | Undo, redo and other keyboard shortcuts                   |  Ongoing ⏳   |
 | Scroll Support (Vertical, and horizontal)                 |  Ongoing ⏳   |
 
-
-## Installation
-
-Instructions on how to install and run the text editor will be provided once the packaging is complete.
 
 ## Contributing
 
