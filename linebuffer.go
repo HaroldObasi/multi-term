@@ -51,7 +51,6 @@ func (lb *LineBuffer) ReDraw(x, y int) {
 	//specified position is 1
 
 	// from 1 to the width of the screen
-	lb.screen.WriteDebug(fmt.Sprintf("Redrawing line at %d, %d", x, y), 1)
 
 	str := lb.GetText()
 	width, _ := lb.screen.tScreen.Size()

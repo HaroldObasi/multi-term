@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/HaroldObasi/multi-term/utils"
 	"github.com/gdamore/tcell/v2"
 )
@@ -250,7 +248,6 @@ func (tb *TabBuffer) ReDraw(y int) {
 	linesToRedraw := validLines[bufferY:] // account for the upper bound, change this whole upperbound logic later
 
 	for count := 0; count < len(linesToRedraw); count++ {
-		tb.screen.WriteDebug(fmt.Sprintf("ui line: %v", displayY), 2)
 
 		tb.lines[bufferY].ReDraw(0, displayY)
 		bufferY++
