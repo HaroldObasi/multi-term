@@ -77,6 +77,13 @@ func (lb *LineBuffer) GetText() string {
 	return sb.String()
 }
 
+func (lb *LineBuffer)GetBufferWithoutGap() []rune{
+	first := lb.buffer[:lb.gapStart]
+	second := lb.buffer[lb.gapEnd+1:]
+
+	return append(first, second...)
+}
+
 func (lb *LineBuffer) GetRunes() string {
 	first := lb.buffer[:lb.gapStart]
 	second := lb.buffer[lb.gapEnd+1:]
