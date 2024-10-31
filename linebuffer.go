@@ -121,19 +121,19 @@ func (lb *LineBuffer) Insert(r rune) {
 	lb.GoTo(lb.cursor.x)
 	lb.buffer[lb.gapStart] = r
 
-	x := lb.gapStart
+	// x := lb.gapStart
 	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y, lb.screen.tabBuffer)
 
 	lb.gapStart++
 
-	str := lb.GetText()
+	// str := lb.GetText()
 
 	// iterate over the string from the gapstart to the end to update the screen
 	// TODO: need to loop over bytes and not string
-	for _, r := range str[x:] {
-		lb.screen.tScreen.SetContent(x, lb.cursor.y, r, nil, tcell.StyleDefault)
-		x++
-	}
+	// for _, r := range str[x:] {
+	// 	lb.screen.tScreen.SetContent(x, lb.cursor.y, r, nil, tcell.StyleDefault)
+	// 	x++
+	// }
 
 	lb.screen.tScreen.Show()
 }
@@ -152,30 +152,30 @@ func (lb *LineBuffer) Delete() {
 	lb.buffer[lb.gapStart-1] = 0
 	lb.gapStart--
 
-	width, _ := lb.screen.tScreen.Size()
+	// width, _ := lb.screen.tScreen.Size()
 
 	// lb.screen.WriteDebug(fmt.Sprintf("Cursor: %v", lb.cursor.x), 3)
-	x := lb.cursor.x - 1
-	if lb.gapEnd >= len(lb.buffer)-1 {
-		lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, ' ', nil, tcell.StyleDefault)
-	} else {
+	// x := lb.cursor.x - 1
+	// if lb.gapEnd >= len(lb.buffer)-1 {
+	// 	lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, ' ', nil, tcell.StyleDefault)
+	// } else {
 
-		// redraw the line from cursor position
-		gapSize := lb.GetGapSize()
+	// 	// redraw the line from cursor position
+	// 	gapSize := lb.GetGapSize()
 
-		for x <= width {
-			if x+gapSize >= len(lb.buffer) {
-				lb.screen.tScreen.SetContent(x, lb.cursor.y, ' ', nil, tcell.StyleDefault)
-			} else {
-				lb.screen.tScreen.SetContent(x, lb.cursor.y, lb.buffer[gapSize+x], nil, tcell.StyleDefault)
-			}
-			x++
-		}
+	// 	for x <= width {
+	// 		if x+gapSize >= len(lb.buffer) {
+	// 			lb.screen.tScreen.SetContent(x, lb.cursor.y, ' ', nil, tcell.StyleDefault)
+	// 		} else {
+	// 			lb.screen.tScreen.SetContent(x, lb.cursor.y, lb.buffer[gapSize+x], nil, tcell.StyleDefault)
+	// 		}
+	// 		x++
+	// 	}
 
-	}
+	// }
 
 	lb.cursor.SetPos(lb.cursor.x-1, lb.cursor.y, lb.screen.tabBuffer)
-	lb.screen.tScreen.Show()
+	// lb.screen.tScreen.Show()
 }
 
 func (lb *LineBuffer) Grow() {
