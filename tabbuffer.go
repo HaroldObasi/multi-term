@@ -240,14 +240,23 @@ func (tb *TabBuffer) AddLine(s string, y int, x int) {
 	tb.lines[tb.gapStart] = newLine
 	tb.gapStart++
 
-	// redraw the current line
-	// currentLine.ReDraw(x, y)
-
-	// redraw the screen from y down
-	// tb.ReDraw(y + 1)
-
 	tb.cursor.SetPos(0, y+1, tb)
 
+}
+
+func (tb *TabBuffer) DeleteLine(y int) {
+	tb.GoTo(y)
+	validLines := tb.GetValidLines()
+	currentLine := validLines[y]
+
+	str := currentLine.GetRunes()
+	prevLine := tb.GetValidLines()[y-1]
+	prevLine.GoToEnd()
+
+	prevLine.AddString(str)
+
+	tb.gapEnd++
+	tb.lines[tb.gapEnd] = &LineBuffer{}
 }
 
 func (tb *TabBuffer) ReDraw(y int) {
