@@ -6,7 +6,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-func HandleEvents(screen *Screen) {
+func HandleEvents(screen *Screen, events chan string) {
 	tScreen := screen.tScreen
 	for {
 		switch ev := tScreen.PollEvent().(type) {
@@ -28,16 +28,20 @@ func HandleEvents(screen *Screen) {
 
 			case tcell.KeyEnter:
 				HandleReturn(screen)
+				events <- "XD"	
 
 			case tcell.KeyTab:
 				// HandleTab(screen)
+				// events <- "tab"
 
 			case tcell.KeyRune:
 				ch := ev.Rune()
 				HandleInsertRune(screen, ch)
+				events <- "XD"	
 
 			case tcell.KeyBackspace, tcell.KeyBackspace2:
 				HandleBackspace(screen)
+				events <- "XD"	
 			}
 		}
 	}
