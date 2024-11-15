@@ -11,6 +11,59 @@ type Screen struct {
 	fileInfoAreaHeight int
 }
 
+func NewTestScreen(argv []string) (*Screen, error) {
+	const DEBUG_AREA_HEIGHT = 5
+	const FILE_INFO_AREA_HEIGHT = 1
+
+
+	s := tcell.NewSimulationScreen("UTF-8")
+	
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
+
+	defStyle := tcell.StyleDefault.
+		Background(tcell.ColorBlack).
+		Foreground(tcell.ColorWhite)
+	s.SetStyle(defStyle)
+
+	screen := &Screen{tScreen: s}
+	var filename string
+
+	if len(argv) > 1 {
+		filename = argv[1]
+	} else {
+		filename = ""
+	}
+
+	screen.debugAreaHeight = DEBUG_AREA_HEIGHT
+	screen.fileInfoAreaHeight = FILE_INFO_AREA_HEIGHT
+	
+	screen.CreateDebugArea()
+	screen.CreateFileInfoArea()
+	screen.WriteFileName(filename, 0)
+	
+	width, height := s.Size()
+
+	bounds := [4][2]int{
+		{0, screen.fileInfoAreaHeight}, 
+		{width, screen.fileInfoAreaHeight}, 
+		{0, height - screen.debugAreaHeight}, 
+		{width, height - screen.debugAreaHeight},
+	}
+
+
+	if filename == "" {
+		screen.tabBuffer = NewTabBuffer("", 10, screen, filename, bounds)
+	} else {
+		screen.tabBuffer = NewTabBufferFromFile(filename, screen, bounds)
+	}
+
+	// screen.tabBuffer.cursor.SetPos(0, bounds[0][1], screen.tabBuffer)
+
+	return screen, nil
+}
+
 func NewScreen(argv []string) (*Screen, error) {
 		
 	const DEBUG_AREA_HEIGHT = 5
