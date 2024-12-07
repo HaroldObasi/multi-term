@@ -7,9 +7,14 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-func HandleRender(events chan string, tScreen tcell.Screen, tb *TabBuffer) {
+// func HandleRender(events chan string, tScreen tcell.Screen, tb *TabBuffer) {
+// 	for range events {
+// 		Render(tScreen, tb)
+// 	}
+// }
+func HandleRender(events chan string, screen *Screen) {
 	for range events {
-		Render(tScreen, tb)
+		Render(screen.tScreen, screen.tabBuffer)
 	}
 }
 
@@ -49,7 +54,9 @@ func main() {
 	}
 
 	events := make(chan string)
+	
 
-	go HandleRender(events, screen.tScreen, screen.tabBuffer)
+	go HandleRender(events, screen)
+	// go HandleRender(events, screen.tScreen, screen.tabBuffer)
 	HandleEvents(screen, events)
 }
