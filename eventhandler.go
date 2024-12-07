@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gdamore/tcell/v2"
 )
 
-func HandleEvents(screen *Screen) {
+func HandleEvents(screen *Screen, events chan string) {
 	tScreen := screen.tScreen
 	for {
 		switch ev := tScreen.PollEvent().(type) {
@@ -14,7 +15,6 @@ func HandleEvents(screen *Screen) {
 			tScreen.Sync()
 		case *tcell.EventKey:
 			switch ev.Key() {
-
 			case tcell.KeyEscape:
 				tScreen.Fini()
 				os.Exit(0)
@@ -28,16 +28,27 @@ func HandleEvents(screen *Screen) {
 
 			case tcell.KeyEnter:
 				HandleReturn(screen)
+				events <- "XD"	
 
 			case tcell.KeyTab:
 				// HandleTab(screen)
+				// events <- "tab"
+
+
+				HandleTestingInsert(screen, "This is a test", events)
 
 			case tcell.KeyRune:
 				ch := ev.Rune()
+				lines := screen.tabBuffer.GetValidLines()
+
+				screen.WriteDebug(fmt.Sprintf("Buffer before insert: %s ", lines[0].GetText()), 3)
 				HandleInsertRune(screen, ch)
+				events <- "XD"	
+				screen.WriteDebug(fmt.Sprintf("Buffer after insert: %s ", lines[0].GetText()), 4)
 
 			case tcell.KeyBackspace, tcell.KeyBackspace2:
 				HandleBackspace(screen)
+				events <- "XD"	
 			}
 		}
 	}
@@ -48,6 +59,17 @@ func HandleSave(screen *Screen) {
 	tb.file.Save(tb)
 
 	screen.WriteDebug("File saved", 4)
+}
+
+func HandleTestingInsert(screen *Screen, s string, events chan string) {
+	tb := screen.tabBuffer
+	cursor := tb.cursor
+	line := tb.GetLine(cursor.y)
+
+	for _, r := range s {
+		line.Insert(r)
+	}
+	events <- "XD"
 }
 
 func HandleInsertRune(screen *Screen, r rune) {

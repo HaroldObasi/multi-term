@@ -77,6 +77,13 @@ func (lb *LineBuffer) GetText() string {
 	return sb.String()
 }
 
+func (lb *LineBuffer)GetBufferWithoutGap() []rune{
+	first := lb.buffer[:lb.gapStart]
+	second := lb.buffer[lb.gapEnd+1:]
+
+	return append(first, second...)
+}
+
 func (lb *LineBuffer) GetRunes() string {
 	first := lb.buffer[:lb.gapStart]
 	second := lb.buffer[lb.gapEnd+1:]
@@ -91,19 +98,20 @@ func (lb *LineBuffer) Write(s string) {
 	// lb.screen.WriteDebug("Done writing string")
 
 }
-
-func (lb *LineBuffer) Add(b byte) {
+// adds a rune to the buffer, without changing the cursor
+func (lb *LineBuffer) Add(r rune) {
 	if lb.GetGapSize() <= 1 {
 		lb.Grow()
 	}
-
-	lb.GoTo(lb.cursor.x)
-	lb.buffer[lb.gapStart] = rune(b)
-
-	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y, lb.screen.tabBuffer)
+	lb.buffer[lb.gapStart] = r
 
 	lb.gapStart++
+}
 
+func (lb *LineBuffer) AddString(s string) {
+	for _, r := range s {
+		lb.Add(rune(r))
+	}
 }
 
 func (lb *LineBuffer) Insert(r rune) {
@@ -114,61 +122,35 @@ func (lb *LineBuffer) Insert(r rune) {
 	lb.GoTo(lb.cursor.x)
 	lb.buffer[lb.gapStart] = r
 
-	x := lb.gapStart
+	// x := lb.gapStart
 	lb.cursor.SetPos(lb.cursor.x+1, lb.cursor.y, lb.screen.tabBuffer)
 
 	lb.gapStart++
 
-	str := lb.GetText()
-
-	// iterate over the string from the gapstart to the end to update the screen
-	// TODO: need to loop over bytes and not string
-	for _, r := range str[x:] {
-		lb.screen.tScreen.SetContent(x, lb.cursor.y, r, nil, tcell.StyleDefault)
-		x++
-	}
-
 	lb.screen.tScreen.Show()
 }
 
-// 100045
-
-// 1_45 => _455 ??
 
 func (lb *LineBuffer) Delete() {
-	if lb.gapStart <= 0 {
+	cursor := lb.cursor
+	cursorX, cursorY := cursor.GetCursorPos()
+
+	if cursorX <= 0 && cursorY <=0 {
 		return
 	}
 
-	lb.GoTo(lb.cursor.x)
+	if cursorX <= 0 {
+		// delete the newline character
+		lb.screen.tabBuffer.DeleteLine(cursorY)
+		return
+	}
+
+	lb.GoTo(cursorX)
 
 	lb.buffer[lb.gapStart-1] = 0
 	lb.gapStart--
 
-	width, _ := lb.screen.tScreen.Size()
-
-	// lb.screen.WriteDebug(fmt.Sprintf("Cursor: %v", lb.cursor.x), 3)
-	x := lb.cursor.x - 1
-	if lb.gapEnd >= len(lb.buffer)-1 {
-		lb.screen.tScreen.SetContent(lb.cursor.x-1, lb.cursor.y, ' ', nil, tcell.StyleDefault)
-	} else {
-
-		// redraw the line from cursor position
-		gapSize := lb.GetGapSize()
-
-		for x <= width {
-			if x+gapSize >= len(lb.buffer) {
-				lb.screen.tScreen.SetContent(x, lb.cursor.y, ' ', nil, tcell.StyleDefault)
-			} else {
-				lb.screen.tScreen.SetContent(x, lb.cursor.y, lb.buffer[gapSize+x], nil, tcell.StyleDefault)
-			}
-			x++
-		}
-
-	}
-
 	lb.cursor.SetPos(lb.cursor.x-1, lb.cursor.y, lb.screen.tabBuffer)
-	lb.screen.tScreen.Show()
 }
 
 func (lb *LineBuffer) Grow() {
@@ -235,6 +217,11 @@ func (lb *LineBuffer) GoTo(pos int) {
 	}
 	// lb.screen.WriteDebug(fmt.Sprintf("new gap start: %d", lb.gapStart), 4)
 
+}
+
+func (lb *LineBuffer) GoToEnd() {
+	index := len(lb.buffer) - lb.GetGapSize()
+	lb.GoTo(index)
 }
 
 // returns the length of the buffer excluding the gap

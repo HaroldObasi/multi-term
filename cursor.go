@@ -24,8 +24,8 @@ func NewCursor(x, y int, screen *Screen) *Cursor {
 func (c *Cursor) SetPos(x, y int, tb *TabBuffer) {
 	sWidth, _ := c.screen.tScreen.Size()
 
-	upperBound := tb.bounds[0][1]
-	lowerBound := tb.bounds[2][1]
+	upperBound := tb.GetUpperBound()
+	lowerBound := tb.GetLowerBound()
 
 	if x < 0 {
 		x = 0
@@ -49,4 +49,10 @@ func (c *Cursor) SetPos(x, y int, tb *TabBuffer) {
 
 	c.screen.WriteDebug(fmt.Sprintf("Col: %d, Row: %d", c.x, c.y), 0)
 	// c.screen.WriteDebug(fmt.Sprintf("buffer: %v ", c.screen.tabBuffer.lines[c.y].buffer), 1)
+}
+
+func (c *Cursor) GetCursorPos() (int, int) {
+	upperBound := c.screen.tabBuffer.GetUpperBound()
+
+	return c.x, c.y - upperBound
 }
