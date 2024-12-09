@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/HaroldObasi/multi-term/screen"
+	"github.com/HaroldObasi/multi-term/window"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ func RunCommand(cmd *cobra.Command, args []string) {
 	fileName, _ := cmd.Flags().GetString("fileName")
 	fmt.Println("Editing file: ", fileName)
 
-	screen := screen.NewScreen()
+	screen := window.NewScreen()
 	err := screen.Start()
 
 	if err != nil {
