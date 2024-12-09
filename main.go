@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"github.com/HaroldObasi/multi-term/cmd"
+)
 
 func main()  {
-	fmt.Println("hello world")
+	cmd.Execute()
 }
