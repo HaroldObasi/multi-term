@@ -3,7 +3,7 @@ package cursor
 import "github.com/gdamore/tcell/v2"
 
 type Cursor struct {
-	X, Y int
+	X, Y   int
 	screen tcell.Screen
 }
 
@@ -12,8 +12,8 @@ func NewCursor(screen tcell.Screen) *Cursor {
 	screen.ShowCursor(X, Y)
 	return &Cursor{
 		screen: screen,
-		X: X,
-		Y: Y,
+		X:      X,
+		Y:      Y,
 	}
 }
 

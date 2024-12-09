@@ -8,10 +8,10 @@ import (
 )
 
 type Window struct {
-	Screen tcell.Screen
+	Screen      tcell.Screen
 	screenStyle tcell.Style
-	Tab *buffer.TabBuffer
-	events chan string 
+	Tab         *buffer.TabBuffer
+	events      chan string
 }
 
 func NewWindow() (*Window, error) {
@@ -21,7 +21,7 @@ func NewWindow() (*Window, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if err := Screen.Init(); err != nil {
 		return nil, err
 	}
@@ -38,14 +38,13 @@ func NewWindow() (*Window, error) {
 
 	win.events = make(chan string, 100)
 
-
 	return win, nil
 }
 
 func NewTestWindow() (*Window, error) {
 	win := &Window{}
 	Screen := tcell.NewSimulationScreen("UTF-8")
-	
+
 	if err := Screen.Init(); err != nil {
 		return nil, err
 	}
@@ -63,7 +62,7 @@ func NewTestWindow() (*Window, error) {
 	return win, nil
 }
 
-func (win *Window) Render(){
+func (win *Window) Render() {
 	// width, height := win.Screen.Size()
 
 	text := win.Tab.Lines[0].GetString()
@@ -76,7 +75,7 @@ func (win *Window) Render(){
 }
 
 func (win *Window) Start() error {
-	go func(){
+	go func() {
 		for range win.events {
 			win.Render()
 		}
@@ -85,7 +84,7 @@ func (win *Window) Start() error {
 	for {
 		// Update Screen
 		win.Screen.Show()
-	
+
 		// Poll and Handle events
 		win.HandleEvents()
 	}
@@ -103,7 +102,7 @@ func (win *Window) HandleEvents() {
 		if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC {
 			win.Quit()
 		}
-		switch ev.Key(){
+		switch ev.Key() {
 		case tcell.KeyRune:
 			ch := ev.Rune()
 			win.Tab.InsertRune(ch)

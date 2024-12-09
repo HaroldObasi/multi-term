@@ -7,11 +7,11 @@ import (
 )
 
 type LineBuffer struct {
-	Buffer []byte
+	Buffer   []byte
 	GapStart int
-	GapEnd int
-	GapSize int
-	Cursor *cursor.Cursor
+	GapEnd   int
+	GapSize  int
+	Cursor   *cursor.Cursor
 }
 
 // String representation of LineBuffer
@@ -33,15 +33,15 @@ func NewLineBuffer(cursor *cursor.Cursor) *LineBuffer {
 	GapSize := 10
 	Buffer := make([]byte, GapSize)
 	return &LineBuffer{
-		Buffer: Buffer,
-		GapSize: GapSize,
+		Buffer:   Buffer,
+		GapSize:  GapSize,
 		GapStart: 0,
-		GapEnd: GapSize,
-		Cursor: cursor,
+		GapEnd:   GapSize,
+		Cursor:   cursor,
 	}
 }
 
-func (lb *LineBuffer) GoTo(pos int){
+func (lb *LineBuffer) GoTo(pos int) {
 	if pos < 0 || pos >= len(lb.Buffer) {
 		return
 	}

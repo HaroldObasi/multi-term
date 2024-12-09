@@ -14,7 +14,7 @@ var rootCmd = &cobra.Command{
 	Long: `Generate and deploy static site portfolio
 	
 	Example: mt -f testing.txt`,
-	
+
 	Run:     RunCommand,
 	PreRunE: PreRunChecks,
 }

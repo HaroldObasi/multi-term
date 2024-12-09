@@ -7,10 +7,10 @@ import (
 
 type TabBuffer struct {
 	GapStart int
-	GapEnd int
-	GapSize int
-	Lines []*LineBuffer
-	Cursor *cursor.Cursor
+	GapEnd   int
+	GapSize  int
+	Lines    []*LineBuffer
+	Cursor   *cursor.Cursor
 }
 
 func NewTabBuffer(screen tcell.Screen) *TabBuffer {
@@ -20,11 +20,11 @@ func NewTabBuffer(screen tcell.Screen) *TabBuffer {
 	lines[0] = NewLineBuffer(cursor)
 
 	return &TabBuffer{
-		GapSize: gapSize,
-		Lines: lines,
+		GapSize:  gapSize,
+		Lines:    lines,
 		GapStart: 0,
-		GapEnd: gapSize,
-		Cursor: cursor,
+		GapEnd:   gapSize,
+		Cursor:   cursor,
 	}
 }
 
@@ -35,7 +35,6 @@ func (tb *TabBuffer) InsertRune(r rune) {
 
 	line.InsertRune(r)
 }
-
 
 func (tb *TabBuffer) GoTo(i int) {
 
@@ -48,4 +47,3 @@ func (tb *TabBuffer) GoLeft() {
 func (tb *TabBuffer) GoRight() {
 
 }
-
