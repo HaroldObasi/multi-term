@@ -27,8 +27,13 @@ func RunCommand(cmd *cobra.Command, args []string) {
 	fileName, _ := cmd.Flags().GetString("fileName")
 	fmt.Println("Editing file: ", fileName)
 
-	win := window.NewWindow()
-	err := win.Start()
+	win, err := window.NewWindow()
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = win.Start()
 
 	if err != nil {
 		panic(err)
