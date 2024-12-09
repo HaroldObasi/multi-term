@@ -16,15 +16,6 @@ type LineBuffer struct {
 
 // String representation of LineBuffer
 func (lb *LineBuffer) String() string {
-	// var sb strings.Builder
-	// for i := 0; i < len(lb.Buffer); i++ {
-	// 	if i >= lb.GapStart && i < lb.GapEnd {
-	// 		continue
-	// 	}
-	// 	sb.WriteByte(lb.Buffer[i])
-	// }
-	// return sb.String()
-
 	return fmt.Sprintf(`
 		GapStart: %v,
 		GapEnd: %v,
