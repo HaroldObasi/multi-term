@@ -11,6 +11,7 @@ type Window struct {
 	Screen tcell.Screen
 	screenStyle tcell.Style
 	Tab *buffer.TabBuffer
+	events chan string 
 }
 
 func NewWindow() (*Window, error) {
@@ -34,6 +35,8 @@ func NewWindow() (*Window, error) {
 
 	tb := buffer.NewTabBuffer(win.Screen)
 	win.Tab = tb // Assign tab buffer to window
+
+	win.events = make(chan string, 100)
 
 
 	return win, nil
@@ -60,7 +63,25 @@ func NewTestWindow() (*Window, error) {
 	return win, nil
 }
 
+func (win *Window) Render(){
+	// width, height := win.Screen.Size()
+
+	text := win.Tab.Lines[0].GetString()
+
+	for i, ch := range text {
+		win.Screen.SetContent(i, 0, ch, nil, win.screenStyle)
+	}
+
+	win.Screen.Show()
+}
+
 func (win *Window) Start() error {
+	go func(){
+		for range win.events {
+			win.Render()
+		}
+	}()
+
 	for {
 		// Update Screen
 		win.Screen.Show()
@@ -86,6 +107,8 @@ func (win *Window) HandleEvents() {
 		case tcell.KeyRune:
 			ch := ev.Rune()
 			win.Tab.InsertRune(ch)
+
+			win.events <- "render"
 		}
 	}
 }
