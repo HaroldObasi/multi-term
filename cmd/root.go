@@ -27,8 +27,8 @@ func RunCommand(cmd *cobra.Command, args []string) {
 	fileName, _ := cmd.Flags().GetString("fileName")
 	fmt.Println("Editing file: ", fileName)
 
-	screen := window.NewScreen()
-	err := screen.Start()
+	win := window.NewWindow()
+	err := win.Start()
 
 	if err != nil {
 		panic(err)
