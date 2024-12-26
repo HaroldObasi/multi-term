@@ -1,6 +1,7 @@
 package window
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/HaroldObasi/multi-term/buffer"
@@ -65,10 +66,19 @@ func NewTestWindow() (*Window, error) {
 func (win *Window) Render() {
 	// width, height := win.Screen.Size()
 
-	text := win.Tab.Lines[0].GetString()
+	// text := win.Tab.Lines[0].GetString()
+	buffer := win.Tab.Lines[0].GetBufferWithoutGap()
 
-	for i, ch := range text {
-		win.Screen.SetContent(i, 0, ch, nil, win.screenStyle)
+	x := 0
+
+	// for i, ch := range text {
+	// 	win.Screen.SetContent(i, 0, ch, nil, win.screenStyle)
+	// }
+
+	for _, b := range buffer {
+		win.Screen.SetContent(x, 0, rune(b), nil, win.screenStyle)
+		fmt.Println()
+		fmt.Println("char: ", string(rune(b)))
 	}
 
 	win.Screen.Show()
@@ -108,6 +118,8 @@ func (win *Window) HandleEvents() {
 			win.Tab.InsertRune(ch)
 
 			win.events <- "render"
+		case tcell.KeyUp, tcell.KeyDown, tcell.KeyLeft, tcell.KeyRight:
+			win.HandleDirection(ev.Key())
 		}
 	}
 }

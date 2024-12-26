@@ -41,9 +41,22 @@ func (tb *TabBuffer) GoTo(i int) {
 }
 
 func (tb *TabBuffer) GoLeft() {
+	X, Y := tb.Cursor.GetPos()
+	tb.Cursor.GoTo(
+		X-1,
+		Y,
+	)
 
 }
 
 func (tb *TabBuffer) GoRight() {
+	X, Y := tb.Cursor.GetPos()
+	tb.Cursor.GoTo(
+		X+1,
+		Y,
+	)
+}
+
+func (tb *TabBuffer) CursorUp() {
 
 }

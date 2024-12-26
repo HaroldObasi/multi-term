@@ -10,7 +10,7 @@ type LineBuffer struct {
 	Buffer   []byte
 	GapStart int
 	GapEnd   int
-	GapSize  int
+	GapSize  int // The Gapsize here represents how much we should grow the buffer by, not the current gapsize of the buffer
 	Cursor   *cursor.Cursor
 }
 
@@ -20,8 +20,9 @@ func (lb *LineBuffer) String() string {
 		GapStart: %v,
 		GapEnd: %v,
 		GapSize: %v,
-		String: %v
-	`, lb.GapStart, lb.GapEnd, lb.GapSize, lb.GetString())
+		String: %v,
+		Buffer: %v
+	`, lb.GapStart, lb.GapEnd, lb.GapSize, lb.GetString(), lb.Buffer)
 }
 
 // Method that returns the buffer as a string without the gap
@@ -36,7 +37,7 @@ func NewLineBuffer(cursor *cursor.Cursor) *LineBuffer {
 		Buffer:   Buffer,
 		GapSize:  GapSize,
 		GapStart: 0,
-		GapEnd:   GapSize,
+		GapEnd:   GapSize - 1,
 		Cursor:   cursor,
 	}
 }
@@ -67,10 +68,12 @@ func (lb *LineBuffer) GoLeft() {
 		return
 	}
 
+	// [ 1 2 0 0]
+	// [ 1 0 0 2]
+
 	lb.Buffer[lb.GapEnd] = lb.Buffer[lb.GapStart-1]
 	lb.GapEnd--
-
-	lb.Buffer[lb.GapStart-1] = 0 // Clear the original position
+	lb.Buffer[lb.GapStart-1] = 0
 	lb.GapStart--
 }
 
@@ -79,14 +82,25 @@ func (lb *LineBuffer) GoRight() {
 		return
 	}
 
+	// [ 1 0 0 2 ]
+	// [ 1 2 0 0 ]
+
 	lb.Buffer[lb.GapStart] = lb.Buffer[lb.GapEnd+1]
 	lb.GapStart++
-
-	lb.Buffer[lb.GapEnd+1] = 0 // Clear the original position
+	lb.Buffer[lb.GapEnd+1] = 0
 	lb.GapEnd++
 }
 
+func (lb *LineBuffer) GetBufferWithoutGap() []byte {
+	return append(lb.Buffer[:lb.GapStart], lb.Buffer[lb.GapEnd:]...)
+}
+
 func (lb *LineBuffer) InsertRune(r rune) {
+
+	if lb.GetGapSize() <= 0 {
+		lb.GrowBuffer()
+	}
+
 	pos := lb.Cursor.X
 	if lb.GapStart >= len(lb.Buffer) {
 		return
@@ -97,4 +111,23 @@ func (lb *LineBuffer) InsertRune(r rune) {
 	lb.Buffer[lb.GapStart] = byte(r)
 	lb.GapStart++
 	lb.Cursor.GoTo(lb.Cursor.X+1, lb.Cursor.Y)
+
+	// fmt.Println()
+	// fmt.Println(lb.Buffer)
+}
+
+func (lb *LineBuffer) GrowBuffer() {
+	newBuffer := make([]byte, lb.GapSize+len(lb.Buffer))
+
+	copy(newBuffer, lb.Buffer[:lb.GapStart])
+
+	newGapEnd := lb.GapStart + lb.GapSize
+	copy(newBuffer[newGapEnd:], lb.Buffer[lb.GapEnd:])
+
+	lb.Buffer = newBuffer
+	lb.GapEnd = newGapEnd
+}
+
+func (lb *LineBuffer) GetGapSize() int {
+	return lb.GapEnd - lb.GapStart
 }
