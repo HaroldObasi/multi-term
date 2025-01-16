@@ -1,7 +1,6 @@
 package window
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/HaroldObasi/multi-term/buffer"
@@ -77,8 +76,7 @@ func (win *Window) Render() {
 
 	for _, b := range buffer {
 		win.Screen.SetContent(x, 0, rune(b), nil, win.screenStyle)
-		fmt.Println()
-		fmt.Println("char: ", string(rune(b)))
+		x++
 	}
 
 	win.Screen.Show()
