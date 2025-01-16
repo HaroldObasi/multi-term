@@ -1,10 +1,18 @@
 package cursor
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"fmt"
+
+	"github.com/gdamore/tcell/v2"
+)
 
 type Cursor struct {
 	X, Y   int
 	screen tcell.Screen
+}
+
+func (cursor *Cursor) String() string {
+	return fmt.Sprintf("X: %v, Y: %v", cursor.X, cursor.Y)
 }
 
 func NewCursor(screen tcell.Screen) *Cursor {
@@ -25,24 +33,26 @@ func (cursor *Cursor) GoTo(x, y int) {
 	if x < 0 || y < 0 {
 		return
 	}
+	cursor.X = x
+	cursor.Y = y
 
-	if x > cursor.X {
-		for i := 0; i < x-cursor.X; i++ {
-			cursor.goRight()
-		}
-	} else if x < cursor.X {
-		for i := 0; i < cursor.X-x; i++ {
-			cursor.goLeft()
-		}
-	} else if y > cursor.Y {
-		for i := 0; i < y-cursor.Y; i++ {
-			cursor.goDown()
-		}
-	} else if y < cursor.Y {
-		for i := 0; i < cursor.Y-y; i++ {
-			cursor.goUp()
-		}
-	}
+	// if x > cursor.X {
+	// 	for i := 0; i < x-cursor.X; i++ {
+	// 		cursor.goRight()
+	// 	}
+	// } else if x < cursor.X {
+	// 	for i := 0; i < cursor.X-x; i++ {
+	// 		cursor.goLeft()
+	// 	}
+	// } else if y > cursor.Y {
+	// 	for i := 0; i < y-cursor.Y; i++ {
+	// 		cursor.goDown()
+	// 	}
+	// } else if y < cursor.Y {
+	// 	for i := 0; i < cursor.Y-y; i++ {
+	// 		cursor.goUp()
+	// 	}
+	// }
 
 	cursor.screen.ShowCursor(cursor.X, cursor.Y)
 }
