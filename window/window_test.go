@@ -102,6 +102,15 @@ func TestInsert(t *testing.T) {
 			wantCursorX:    1,
 			originalString: "ab",
 		},
+		{
+			name:           "insert xx in 'hello world' at pos 0",
+			insertPosX:     0,
+			insertPosY:     0,
+			insertString:   "xx",
+			wantText:       "xxhello world",
+			wantCursorX:    2,
+			originalString: "hello world",
+		},
 	}
 
 	for _, tt := range tests {
@@ -126,8 +135,15 @@ func TestInsert(t *testing.T) {
 			}
 
 			fmt.Println("Line After Insert: ", line)
+			// check if the text is as expected
+			if line.GetString() != tt.wantText {
+				t.Errorf("got '%s', want '%s'", line.GetString(), tt.wantText)
+			}
 
-			// check if
+			// check if the cursor is at the right position
+			if tab.Cursor.X != tt.wantCursorX {
+				t.Errorf("cursor at x=%d, want x=%d", tab.Cursor.X, tt.wantCursorX)
+			}
 		})
 	}
 
