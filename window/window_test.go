@@ -103,12 +103,12 @@ func TestInsert(t *testing.T) {
 			originalString: "ab",
 		},
 		{
-			name:           "insert xx in 'hello world' at pos 0",
+			name:           "insert 'testing' in 'hello world' at pos 0",
 			insertPosX:     0,
 			insertPosY:     0,
-			insertString:   "xx",
-			wantText:       "xxhello world",
-			wantCursorX:    2,
+			insertString:   "testing",
+			wantText:       "testinghello world",
+			wantCursorX:    7,
 			originalString: "hello world",
 		},
 	}
