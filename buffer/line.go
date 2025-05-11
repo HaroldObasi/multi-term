@@ -25,10 +25,32 @@ func (lb *LineBuffer) String() string {
 	`, lb.GapStart, lb.GapEnd, lb.GapSize, lb.GetString(), lb.Buffer)
 }
 
-// Method that returns the buffer as a string without the gap
 func (lb *LineBuffer) GetString() string {
-	return string(lb.Buffer[:lb.GapStart]) + string(lb.Buffer[lb.GapEnd:])
+	// If GapEnd is the inclusive end of the gap, text after gap starts at GapEnd+1
+	if lb.GapEnd+1 >= len(lb.Buffer) { // Check if there's any text after the gap
+		return string(lb.Buffer[:lb.GapStart])
+	}
+	return string(lb.Buffer[:lb.GapStart]) + string(lb.Buffer[lb.GapEnd+1:])
 }
+
+// ...existing code...
+
+func (lb *LineBuffer) GetBufferWithoutGap() []byte {
+	// If GapEnd is the inclusive end of the gap, text after gap starts at GapEnd+1
+	if lb.GapEnd+1 >= len(lb.Buffer) { // Check if there's any text after the gap
+		return lb.Buffer[:lb.GapStart]
+	}
+	return append(lb.Buffer[:lb.GapStart], lb.Buffer[lb.GapEnd+1:]...)
+}
+
+// Method that returns the buffer as a string without the gap
+// func (lb *LineBuffer) GetString() string {
+// 	return string(lb.Buffer[:lb.GapStart]) + string(lb.Buffer[lb.GapEnd:])
+// }
+
+// func (lb *LineBuffer) GetBufferWithoutGap() []byte {
+// 	return append(lb.Buffer[:lb.GapStart], lb.Buffer[lb.GapEnd:]...)
+// }
 
 func NewLineBuffer(cursor *cursor.Cursor) *LineBuffer {
 	GapSize := 10
@@ -89,10 +111,6 @@ func (lb *LineBuffer) GoRight() {
 	lb.GapStart++
 	lb.Buffer[lb.GapEnd+1] = 0
 	lb.GapEnd++
-}
-
-func (lb *LineBuffer) GetBufferWithoutGap() []byte {
-	return append(lb.Buffer[:lb.GapStart], lb.Buffer[lb.GapEnd:]...)
 }
 
 func (lb *LineBuffer) InsertRune(r rune) {
