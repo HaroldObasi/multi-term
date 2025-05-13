@@ -1,6 +1,7 @@
 package window
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/HaroldObasi/multi-term/buffer"
@@ -118,7 +119,15 @@ func (win *Window) HandleEvents() {
 			win.events <- "render"
 		case tcell.KeyUp, tcell.KeyDown, tcell.KeyLeft, tcell.KeyRight:
 			win.HandleDirection(ev.Key())
+		case tcell.KeyTab:
+			win.Tab.InsertString("te")
+			win.events <- "render"
 		}
+		fmt.Print("\033[20;0H\033[K")
+		fmt.Println(win.Tab.Lines[0].GapStart, win.Tab.Lines[0].GapEnd)
+
+		fmt.Print("\033[21;0H\033[K")
+		fmt.Println(win.Tab.Lines[0].Buffer)
 	}
 }
 

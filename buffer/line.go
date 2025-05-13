@@ -33,8 +33,6 @@ func (lb *LineBuffer) GetString() string {
 	return string(lb.Buffer[:lb.GapStart]) + string(lb.Buffer[lb.GapEnd+1:])
 }
 
-// ...existing code...
-
 func (lb *LineBuffer) GetBufferWithoutGap() []byte {
 	// If GapEnd is the inclusive end of the gap, text after gap starts at GapEnd+1
 	if lb.GapEnd+1 >= len(lb.Buffer) { // Check if there's any text after the gap
@@ -42,15 +40,6 @@ func (lb *LineBuffer) GetBufferWithoutGap() []byte {
 	}
 	return append(lb.Buffer[:lb.GapStart], lb.Buffer[lb.GapEnd+1:]...)
 }
-
-// Method that returns the buffer as a string without the gap
-// func (lb *LineBuffer) GetString() string {
-// 	return string(lb.Buffer[:lb.GapStart]) + string(lb.Buffer[lb.GapEnd:])
-// }
-
-// func (lb *LineBuffer) GetBufferWithoutGap() []byte {
-// 	return append(lb.Buffer[:lb.GapStart], lb.Buffer[lb.GapEnd:]...)
-// }
 
 func NewLineBuffer(cursor *cursor.Cursor) *LineBuffer {
 	GapSize := 10
@@ -90,9 +79,6 @@ func (lb *LineBuffer) GoLeft() {
 		return
 	}
 
-	// [ 1 2 0 0]
-	// [ 1 0 0 2]
-
 	lb.Buffer[lb.GapEnd] = lb.Buffer[lb.GapStart-1]
 	lb.GapEnd--
 	lb.Buffer[lb.GapStart-1] = 0
@@ -104,9 +90,6 @@ func (lb *LineBuffer) GoRight() {
 		return
 	}
 
-	// [ 1 0 0 2 ]
-	// [ 1 2 0 0 ]
-
 	lb.Buffer[lb.GapStart] = lb.Buffer[lb.GapEnd+1]
 	lb.GapStart++
 	lb.Buffer[lb.GapEnd+1] = 0
@@ -115,23 +98,22 @@ func (lb *LineBuffer) GoRight() {
 
 func (lb *LineBuffer) InsertRune(r rune) {
 
-	if lb.GetGapSize() <= 0 {
+	if lb.GetGapSize() <= 1 { // grow the buffer when there's only one space left
 		lb.GrowBuffer()
 	}
 
-	pos := lb.Cursor.X
 	if lb.GapStart >= len(lb.Buffer) {
+		fmt.Print("\033[8;0H")
+		fmt.Println("Buffer is full")
 		return
 	}
 
-	lb.GoTo(pos)
+	// lb.GoTo(pos)
 
 	lb.Buffer[lb.GapStart] = byte(r)
 	lb.GapStart++
-	lb.Cursor.GoTo(lb.Cursor.X+1, lb.Cursor.Y)
 
-	// fmt.Println()
-	// fmt.Println(lb.Buffer)
+	lb.Cursor.GoTo(lb.Cursor.X+1, lb.Cursor.Y)
 }
 
 func (lb *LineBuffer) GrowBuffer() {
@@ -147,5 +129,5 @@ func (lb *LineBuffer) GrowBuffer() {
 }
 
 func (lb *LineBuffer) GetGapSize() int {
-	return lb.GapEnd - lb.GapStart
+	return (lb.GapEnd - lb.GapStart) + 1
 }
