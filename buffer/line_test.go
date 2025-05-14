@@ -59,6 +59,16 @@ type testBackDelete struct {
 	wantGapEnd       int
 }
 
+type testDeleteFromX struct {
+	name             string
+	originalBuffer   []byte
+	wantBuffer       []byte
+	originalGapStart int
+	wantGapStart     int
+	originalGapEnd   int
+	wantGapEnd       int
+}
+
 var lineInsertTests = []lineInsertTest{
 	{
 		name:           "insert 'c' in 'ab' at pos 2",
@@ -181,6 +191,36 @@ var backDeleteTests = []testBackDelete{
 		wantGapStart:     2,
 		originalGapEnd:   9,
 		wantGapEnd:       9,
+	},
+}
+
+var deleteFromXTests = []testDeleteFromX{
+	{
+		name:             "delete from position 3 to end",
+		originalBuffer:   []byte{49, 50, 51, 0, 0, 0, 53, 54}, // [1, 2, 3, 0, 0, 0, 5, 6]
+		wantBuffer:       []byte{49, 50, 51, 0, 0, 0, 0, 0},   // [1, 2, 3, 0, 0, 0, 0, 0]
+		originalGapStart: 3,
+		wantGapStart:     3,
+		originalGapEnd:   5,
+		wantGapEnd:       7,
+	},
+	{
+		name:             "delete from position 0 to end with gap at start",
+		originalBuffer:   []byte{0, 0, 0, 49, 50, 51}, // [0, 0, 0, 1, 2, 3]
+		wantBuffer:       []byte{0, 0, 0, 0, 0, 0},    // [0, 0, 0, 0, 0, 0]
+		originalGapStart: 0,
+		wantGapStart:     0,
+		originalGapEnd:   2,
+		wantGapEnd:       5,
+	},
+	{
+		name:             "delete from middle to end with gap at start",
+		originalBuffer:   []byte{0, 0, 1, 2, 3}, // [0, 0, 1, 2, 3]
+		wantBuffer:       []byte{0, 0, 0, 0, 0}, // [0, 0, 0, 0, 0]
+		originalGapStart: 0,
+		wantGapStart:     0,
+		originalGapEnd:   1,
+		wantGapEnd:       4,
 	},
 }
 
@@ -373,5 +413,40 @@ func TestBackDelete(t *testing.T) {
 
 		})
 
+	}
+}
+func TestDeleteFromX(t *testing.T) {
+	win, err := window.NewTestWindow()
+
+	if err != nil {
+		t.Fatalf("Error creating new window: %v", err)
+	}
+
+	for _, test := range deleteFromXTests {
+		fmt.Println()
+
+		t.Run(test.name, func(t *testing.T) {
+			tab := buffer.NewTabBuffer(win.Screen)
+			line := tab.Lines[0]
+
+			line.Buffer = test.originalBuffer
+			line.GapStart = test.originalGapStart
+			line.GapEnd = test.originalGapEnd
+
+			line.DeleteFromX()
+
+			if !bytes.Equal(line.Buffer, test.wantBuffer) {
+				fmt.Println(line.Buffer)
+				t.Errorf("got '%v', want %v", line.Buffer, test.wantBuffer)
+				fmt.Println(test.wantBuffer)
+			}
+
+			if line.GapStart != test.wantGapStart {
+				t.Errorf("gap start at x=%d, want x=%d", line.GapStart, test.wantGapStart)
+			}
+			if line.GapEnd != test.wantGapEnd {
+				t.Errorf("gap end at x=%d, want x=%d", line.GapEnd, test.wantGapEnd)
+			}
+		})
 	}
 }
