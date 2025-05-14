@@ -19,7 +19,7 @@ func NewTabBuffer(screen tcell.Screen) *TabBuffer {
 	gapSize := 10
 	lines := make([]*LineBuffer, gapSize)
 	cursor := cursor.NewCursor(screen)
-	lines[0] = NewLineBuffer(cursor)
+	lines[0] = NewLineBuffer(cursor, []byte{})
 
 	return &TabBuffer{
 		GapSize:  gapSize,
@@ -77,7 +77,34 @@ func (tb *TabBuffer) InsertString(s string) {
 	for _, r := range s {
 		tb.InsertRune(r)
 	}
+}
 
+func (tb *TabBuffer) EnterLine() {
+	// first get characters after cursor
+	posX, posY := tb.Cursor.GetPos()
+	linesWithoutGap := tb.GetLinesWithoutGap()
+
+	currentLine := linesWithoutGap[posY]
+	bufferWithoutGap := currentLine.GetBufferWithoutGap()
+
+	bytesAfterCursor := bufferWithoutGap[posX:]
+	// create new line buffer with characters
+	newLine := NewLineBuffer(tb.Cursor, bytesAfterCursor)
+	tb.InsertLine(newLine)
+
+	// if gap is empty grow buffer
+}
+
+func (tb *TabBuffer) InsertLine(lb *LineBuffer) {
+	if tb.GetGapSize() <= 1 {
+		// grow tb
+	}
+
+	tb.Lines[tb.GapStart] = lb
+	tb.GapStart++
+
+	tb.Cursor.GoTo(0, tb.Cursor.Y+1)
+	lb.GoTo(0)
 }
 
 func (tb *TabBuffer) GoTo(i int) {
