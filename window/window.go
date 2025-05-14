@@ -138,6 +138,10 @@ func (win *Window) HandleEvents() {
 		case tcell.KeyTab:
 			win.Tab.InsertString("te")
 			win.events <- "insert_string"
+
+		case tcell.KeyEnter:
+			win.Tab.EnterLine()
+			win.events <- "return"
 		}
 		fmt.Print("\033[20;0H\033[K")
 		fmt.Printf("Start,End: %d,%d\t", win.Tab.Lines[0].GapStart, win.Tab.Lines[0].GapEnd)
