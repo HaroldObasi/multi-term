@@ -64,20 +64,30 @@ func NewTestWindow() (*Window, error) {
 }
 
 func (win *Window) Render() {
-	// width, height := win.Screen.Size()
+	width, height := win.Screen.Size()
 
-	// text := win.Tab.Lines[0].GetString()
-	buffer := win.Tab.Lines[0].GetBufferWithoutGap()
+	for y := range height {
+		// fmt.Printf("y: %v, height: %v \n", y, height)
 
-	x := 0
+		if y >= win.Tab.GetContentLength() {
+			break
+		}
 
-	// for i, ch := range text {
-	// 	win.Screen.SetContent(i, 0, ch, nil, win.screenStyle)
-	// }
+		linesWithoutGap := win.Tab.GetLinesWithoutGap()
+		currentLine := linesWithoutGap[y]
 
-	for _, b := range buffer {
-		win.Screen.SetContent(x, 0, rune(b), nil, win.screenStyle)
-		x++
+		for x := range width {
+
+			if x >= currentLine.GetContentLength() {
+				win.Screen.SetContent(x, y, 0, nil, win.screenStyle)
+				continue
+			}
+
+			bufferWithoutGap := currentLine.GetBufferWithoutGap()
+			b := bufferWithoutGap[x]
+
+			win.Screen.SetContent(x, y, rune(b), nil, win.screenStyle)
+		}
 	}
 
 	win.Screen.Show()
@@ -116,18 +126,18 @@ func (win *Window) HandleEvents() {
 			ch := ev.Rune()
 			win.Tab.InsertRune(ch)
 
-			win.events <- "render"
+			win.events <- "insert"
 
 		case tcell.KeyBackspace, tcell.KeyBackspace2:
 			win.Tab.BackDelete()
-			win.events <- "render"
+			win.events <- "backspace"
 
 		case tcell.KeyUp, tcell.KeyDown, tcell.KeyLeft, tcell.KeyRight:
 			win.HandleDirection(ev.Key())
 
 		case tcell.KeyTab:
 			win.Tab.InsertString("te")
-			win.events <- "render"
+			win.events <- "insert_string"
 		}
 		fmt.Print("\033[20;0H\033[K")
 		fmt.Printf("Start,End: %d,%d\t", win.Tab.Lines[0].GapStart, win.Tab.Lines[0].GapEnd)
