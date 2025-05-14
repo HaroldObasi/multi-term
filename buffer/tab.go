@@ -63,11 +63,16 @@ func (tb *TabBuffer) GoLeft() {
 
 func (tb *TabBuffer) GoRight() {
 	X, Y := tb.Cursor.GetPos()
+	currentLine := tb.Lines[Y]
+
+	if X >= currentLine.GetContentLength() {
+		return
+	}
+
 	tb.Cursor.GoTo(
 		X+1,
 		Y,
 	)
-	currentLine := tb.Lines[Y]
 	currentLine.GoRight()
 }
 
