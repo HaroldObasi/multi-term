@@ -49,6 +49,16 @@ type testSingleInsert struct {
 	targetValue      byte
 }
 
+type testBackDelete struct {
+	name             string
+	originalBuffer   []byte
+	wantBuffer       []byte
+	originalGapStart int
+	wantGapStart     int
+	originalGapEnd   int
+	wantGapEnd       int
+}
+
 var lineInsertTests = []lineInsertTest{
 	{
 		name:           "insert 'c' in 'ab' at pos 2",
@@ -144,6 +154,36 @@ var testSingleInsertTests = []testSingleInsert{
 	},
 }
 
+var backDeleteTests = []testBackDelete{
+	{
+		name:             "Testing back delete in middle",
+		originalBuffer:   []byte{97, 0, 0, 0, 0, 0, 0, 0, 98, 99},
+		wantBuffer:       []byte{0, 0, 0, 0, 0, 0, 0, 0, 98, 99},
+		originalGapStart: 1,
+		wantGapStart:     0,
+		originalGapEnd:   7,
+		wantGapEnd:       7,
+	},
+	{
+		name:             "Testing back delete at start",
+		originalBuffer:   []byte{0, 0, 0, 0, 0, 0, 0, 97, 98, 99},
+		wantBuffer:       []byte{0, 0, 0, 0, 0, 0, 0, 97, 98, 99},
+		originalGapStart: 0,
+		wantGapStart:     0,
+		originalGapEnd:   6,
+		wantGapEnd:       6,
+	},
+	{
+		name:             "Testing back delete at end",
+		originalBuffer:   []byte{97, 98, 99, 0, 0, 0, 0, 0, 0, 0},
+		wantBuffer:       []byte{97, 98, 0, 0, 0, 0, 0, 0, 0, 0},
+		originalGapStart: 3,
+		wantGapStart:     2,
+		originalGapEnd:   9,
+		wantGapEnd:       9,
+	},
+}
+
 func TestInsert(t *testing.T) {
 	win, err := window.NewTestWindow()
 
@@ -177,7 +217,7 @@ func TestInsert(t *testing.T) {
 
 			// check if the text is as expected
 			if line.GetString() != tt.wantText {
-				t.Errorf("got '%q', want '%q'", line.GetString(), tt.wantText)
+				t.Errorf("got '%v', want '%v'", line.GetString(), tt.wantText)
 			}
 
 			// check if the cursor is at the right position
@@ -214,7 +254,7 @@ func TestGrowBuffer(t *testing.T) {
 
 			// check if the text is as expected
 			if !bytes.Equal(line.Buffer, tt.wantBuffer) {
-				t.Errorf("got '%q', want '%q'", line.Buffer, tt.wantBuffer)
+				t.Errorf("got '%v', want '%v'", line.Buffer, tt.wantBuffer)
 			}
 
 			// check if the cursor is at the right position
@@ -252,7 +292,7 @@ func TestGoTo(t *testing.T) {
 
 			// check if the text is as expected
 			if !bytes.Equal(line.Buffer, tt.wantBuffer) {
-				t.Errorf("got '%q', want '%q'", line.Buffer, tt.wantBuffer)
+				t.Errorf("got '%v', want '%v'", line.Buffer, tt.wantBuffer)
 			}
 
 			// check if the cursor is at the right position
@@ -289,8 +329,46 @@ func TestSingleInsert(t *testing.T) {
 
 			if !bytes.Equal(line.Buffer, test.wantBuffer) {
 				fmt.Println(line.Buffer)
-				t.Errorf("got '%q', want %q", line.Buffer, test.wantBuffer)
+				t.Errorf("got '%v', want %v", line.Buffer, test.wantBuffer)
 				fmt.Println(test.wantBuffer)
+			}
+
+		})
+
+	}
+}
+
+func TestBackDelete(t *testing.T) {
+	win, err := window.NewTestWindow()
+
+	if err != nil {
+		t.Fatalf("Error creating new window: %v", err)
+	}
+
+	for _, test := range backDeleteTests {
+		fmt.Println()
+
+		t.Run(test.name, func(t *testing.T) {
+			tab := buffer.NewTabBuffer(win.Screen)
+			line := tab.Lines[0]
+
+			line.Buffer = test.originalBuffer
+			line.GapStart = test.originalGapStart
+			line.GapEnd = test.originalGapEnd
+
+			line.BackDelete()
+
+			if !bytes.Equal(line.Buffer, test.wantBuffer) {
+				fmt.Println(line.Buffer)
+				t.Errorf("got '%v', want %v", line.Buffer, test.wantBuffer)
+				fmt.Println(test.wantBuffer)
+			}
+
+			if line.GapStart != test.wantGapStart {
+				t.Errorf("gap start at x=%d, want x=%d", line.GapStart, test.wantGapStart)
+			}
+			if line.GapEnd != test.wantGapEnd {
+				t.Errorf("gap end at x=%d, want x=%d", line.GapEnd, test.wantGapEnd)
 			}
 
 		})
