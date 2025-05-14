@@ -43,6 +43,19 @@ func (tb *TabBuffer) GetContentLength() int {
 	return linesLength - gapSize
 }
 
+func (tb *TabBuffer) GetLinesWithoutGap() []*LineBuffer {
+	if tb.GapEnd+1 >= len(tb.Lines) {
+		return tb.Lines[:tb.GapStart]
+	}
+
+	var tmp []*LineBuffer
+
+	tmp = append(tmp, tb.Lines[:tb.GapStart]...)
+	tmp = append(tmp, tb.Lines[tb.GapEnd+1:]...)
+
+	return tmp
+}
+
 func (tb *TabBuffer) InsertRune(r rune) {
 	_, posY := tb.Cursor.GetPos()
 
