@@ -119,7 +119,7 @@ func (win *Window) HandleEvents() {
 			win.events <- "render"
 
 		case tcell.KeyBackspace, tcell.KeyBackspace2:
-			win.Tab.Delete()
+			win.Tab.BackDelete()
 			win.events <- "render"
 
 		case tcell.KeyUp, tcell.KeyDown, tcell.KeyLeft, tcell.KeyRight:
