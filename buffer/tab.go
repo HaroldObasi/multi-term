@@ -1,6 +1,8 @@
 package buffer
 
 import (
+	"fmt"
+
 	"github.com/HaroldObasi/multi-term/cursor"
 	"github.com/gdamore/tcell/v2"
 )
@@ -22,10 +24,23 @@ func NewTabBuffer(screen tcell.Screen) *TabBuffer {
 	return &TabBuffer{
 		GapSize:  gapSize,
 		Lines:    lines,
-		GapStart: 0,
-		GapEnd:   gapSize,
+		GapStart: 1,
+		GapEnd:   gapSize - 1,
 		Cursor:   cursor,
 	}
+}
+
+func (tb *TabBuffer) GetGapSize() int {
+	return (tb.GapEnd - tb.GapStart) + 1
+}
+
+func (tb *TabBuffer) GetContentLength() int {
+	gapSize := tb.GetGapSize()
+	linesLength := len(tb.Lines)
+
+	fmt.Print("\033[27;0H\033[K")
+	fmt.Printf("gap start: %v, gap end: %v", tb.GapStart, tb.GapEnd)
+	return linesLength - gapSize
 }
 
 func (tb *TabBuffer) InsertRune(r rune) {
