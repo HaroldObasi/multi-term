@@ -125,7 +125,19 @@ func (lb *LineBuffer) InsertRune(r rune) {
 	lb.GapStart++
 
 	lb.Cursor.GoTo(lb.Cursor.X+1, lb.Cursor.Y)
+}
 
+func (lb *LineBuffer) BackDelete() {
+	// [97 0 0 0 0 0 0 0 98 99] == [0 0 0 0 0 0 0 0 98 99]
+	// [0 0 0 0 0 0 0 97 98 99] == [0 0 0 0 0 0 0 97 98 99]
+
+	if lb.GapStart <= 0 {
+		return
+	}
+
+	lb.Buffer[lb.GapStart-1] = 0
+	lb.GapStart -= 1
+	lb.Cursor.GoTo(lb.Cursor.X-1, lb.Cursor.Y)
 }
 
 func (lb *LineBuffer) GrowBuffer() {
