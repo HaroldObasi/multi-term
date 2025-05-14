@@ -141,6 +141,56 @@ func (tb *TabBuffer) GoRight() {
 	currentLine.GoRight()
 }
 
+func (tb *TabBuffer) GoUp() {
+	if tb.GapStart <= 0 {
+		return
+	}
+
+	_, Y := tb.Cursor.GetPos()
+
+	tb.Lines[tb.GapEnd] = tb.Lines[tb.GapStart-1]
+	tb.GapEnd--
+
+	tb.Lines[tb.GapStart-1] = &LineBuffer{}
+	tb.GapStart--
+
+	linesWithoutGap := tb.GetLinesWithoutGap()
+	currentLine := linesWithoutGap[Y-1]
+
+	contentLength := currentLine.GetContentLength()
+	currentLine.GoTo(contentLength)
+
+	tb.Cursor.GoTo(
+		contentLength,
+		Y-1,
+	)
+}
+
+func (tb *TabBuffer) GoDown() {
+	if tb.GapEnd >= len(tb.Lines)-1 {
+		return
+	}
+	_, Y := tb.Cursor.GetPos()
+
+	tb.Lines[tb.GapStart] = tb.Lines[tb.GapEnd+1]
+	tb.GapStart++
+
+	tb.Lines[tb.GapEnd+1] = &LineBuffer{}
+	tb.GapEnd++
+
+	linesWithoutGap := tb.GetLinesWithoutGap()
+	currentLine := linesWithoutGap[Y+1]
+
+	contentLength := currentLine.GetContentLength()
+	currentLine.GoTo(contentLength)
+
+	tb.Cursor.GoTo(
+		contentLength,
+		Y+1,
+	)
+
+}
+
 func (tb *TabBuffer) CursorUp() {
 
 }
