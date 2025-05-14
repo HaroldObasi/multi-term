@@ -53,14 +53,20 @@ func (lb *LineBuffer) GetBufferWithoutGap() []byte {
 	return tmp
 }
 
-func NewLineBuffer(cursor *cursor.Cursor) *LineBuffer {
+func NewLineBuffer(cursor *cursor.Cursor, buffer []byte) *LineBuffer {
 	GapSize := 10
-	Buffer := make([]byte, GapSize)
+	gapStart := len(buffer)
+
+	emptyBuffer := make([]byte, GapSize)
+	buffer = append(buffer, emptyBuffer...)
+
+	gapEnd := len(buffer) - 1
+
 	return &LineBuffer{
-		Buffer:   Buffer,
+		Buffer:   buffer,
 		GapSize:  GapSize,
-		GapStart: 0,
-		GapEnd:   GapSize - 1,
+		GapStart: gapStart,
+		GapEnd:   gapEnd,
 		Cursor:   cursor,
 	}
 }
