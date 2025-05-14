@@ -146,6 +146,16 @@ func (lb *LineBuffer) BackDelete() {
 	lb.Cursor.GoTo(lb.Cursor.X-1, lb.Cursor.Y)
 }
 
+func (lb *LineBuffer) DeleteFromX() {
+
+	arrSize := len(lb.Buffer) - lb.GapStart
+	emptyBytes := make([]byte, arrSize)
+
+	copy(lb.Buffer[lb.GapStart:], emptyBytes)
+
+	lb.GapEnd = len(lb.Buffer) - 1
+}
+
 func (lb *LineBuffer) GrowBuffer() {
 	newBuffer := make([]byte, lb.GapSize+len(lb.Buffer))
 
