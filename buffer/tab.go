@@ -15,6 +15,24 @@ type TabBuffer struct {
 	Cursor   *cursor.Cursor
 }
 
+func (tb *TabBuffer) String() string {
+	var result string
+	result = "["
+	for i, line := range tb.Lines {
+		if i > 0 {
+			result += ", "
+		}
+		if line != nil && line.Buffer != nil {
+			result += fmt.Sprintf("Line %d", i)
+		} else {
+			result += "nil"
+		}
+	}
+	result += "]"
+	return result
+
+}
+
 func NewTabBuffer(screen tcell.Screen) *TabBuffer {
 	gapSize := 10
 	lines := make([]*LineBuffer, gapSize)
@@ -37,9 +55,6 @@ func (tb *TabBuffer) GetGapSize() int {
 func (tb *TabBuffer) GetContentLength() int {
 	gapSize := tb.GetGapSize()
 	linesLength := len(tb.Lines)
-
-	fmt.Print("\033[27;0H\033[K")
-	fmt.Printf("gap start: %v, gap end: %v", tb.GapStart, tb.GapEnd)
 	return linesLength - gapSize
 }
 
@@ -97,9 +112,21 @@ func (tb *TabBuffer) EnterLine() {
 	tb.InsertLine(newLine)
 }
 
+func (tb *TabBuffer) GrowBuffer() {
+	newLines := make([]*LineBuffer, tb.GapSize+len(tb.Lines))
+
+	copy(newLines, tb.Lines[:tb.GapStart])
+
+	newGapEnd := tb.GapStart + tb.GapSize
+	copy(newLines[newGapEnd:], tb.Lines[tb.GapEnd:])
+
+	tb.Lines = newLines
+	tb.GapEnd = newGapEnd
+}
+
 func (tb *TabBuffer) InsertLine(lb *LineBuffer) {
 	if tb.GetGapSize() <= 1 {
-		// grow tb
+		tb.GrowBuffer()
 	}
 
 	tb.Lines[tb.GapStart] = lb
@@ -142,7 +169,7 @@ func (tb *TabBuffer) GoRight() {
 }
 
 func (tb *TabBuffer) GoUp() {
-	if tb.GapStart <= 0 {
+	if tb.GapStart <= 1 {
 		return
 	}
 
