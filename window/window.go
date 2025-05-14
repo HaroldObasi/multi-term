@@ -1,7 +1,6 @@
 package window
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/HaroldObasi/multi-term/buffer"
@@ -143,10 +142,11 @@ func (win *Window) HandleEvents() {
 			win.Tab.EnterLine()
 			win.events <- "return"
 		}
-		fmt.Print("\033[20;0H\033[K")
-		fmt.Printf("Start,End: %d,%d\t", win.Tab.Lines[0].GapStart, win.Tab.Lines[0].GapEnd)
-		fmt.Printf("%v\t\t\t", win.Tab.Lines[0].Buffer)
-		fmt.Println(win.Tab.Lines[0].GetString())
+		// fmt.Print("\033[20;0H\033[K")
+		// fmt.Printf("Tab Lines: %v", win.Tab)
+		// fmt.Printf("Start,End: %d,%d\t", win.Tab.Lines[0].GapStart, win.Tab.Lines[0].GapEnd)
+		// fmt.Printf("%v\t\t\t", win.Tab.Lines[0].Buffer)
+		// fmt.Println(win.Tab.Lines[0].GetString())
 	}
 }
 
