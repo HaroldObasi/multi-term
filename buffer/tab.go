@@ -88,11 +88,13 @@ func (tb *TabBuffer) EnterLine() {
 	bufferWithoutGap := currentLine.GetBufferWithoutGap()
 
 	bytesAfterCursor := bufferWithoutGap[posX:]
+
 	// create new line buffer with characters
 	newLine := NewLineBuffer(tb.Cursor, bytesAfterCursor)
-	tb.InsertLine(newLine)
 
-	// if gap is empty grow buffer
+	// delete bytes after cursor from current line
+	currentLine.DeleteFromX()
+	tb.InsertLine(newLine)
 }
 
 func (tb *TabBuffer) InsertLine(lb *LineBuffer) {
