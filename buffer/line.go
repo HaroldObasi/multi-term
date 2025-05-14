@@ -35,6 +35,13 @@ func (lb *LineBuffer) GetString() string {
 	return string(lb.Buffer[:lb.GapStart]) + string(lb.Buffer[lb.GapEnd+1:])
 }
 
+func (lb *LineBuffer) GetContentLength() int {
+	gapSize := lb.GetGapSize()
+	bufferLength := len(lb.Buffer)
+
+	return bufferLength - gapSize
+}
+
 func (lb *LineBuffer) GetBufferWithoutGap() []byte {
 	// If GapEnd is the inclusive end of the gap, text after gap starts at GapEnd+1
 	if lb.GapEnd+1 >= len(lb.Buffer) { // Check if there's any text after the gap
