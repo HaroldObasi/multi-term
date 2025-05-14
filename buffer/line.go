@@ -2,11 +2,13 @@ package buffer
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/HaroldObasi/multi-term/cursor"
 )
 
 type LineBuffer struct {
+	mu       sync.Mutex
 	Buffer   []byte
 	GapStart int
 	GapEnd   int
@@ -38,7 +40,10 @@ func (lb *LineBuffer) GetBufferWithoutGap() []byte {
 	if lb.GapEnd+1 >= len(lb.Buffer) { // Check if there's any text after the gap
 		return lb.Buffer[:lb.GapStart]
 	}
-	return append(lb.Buffer[:lb.GapStart], lb.Buffer[lb.GapEnd+1:]...)
+	var tmp []byte
+	tmp = append(tmp, lb.Buffer[:lb.GapStart]...)
+	tmp = append(tmp, lb.Buffer[lb.GapEnd+1:]...)
+	return tmp
 }
 
 func NewLineBuffer(cursor *cursor.Cursor) *LineBuffer {
@@ -97,7 +102,6 @@ func (lb *LineBuffer) GoRight() {
 }
 
 func (lb *LineBuffer) InsertRune(r rune) {
-
 	if lb.GetGapSize() <= 1 { // grow the buffer when there's only one space left
 		lb.GrowBuffer()
 	}
@@ -114,6 +118,7 @@ func (lb *LineBuffer) InsertRune(r rune) {
 	lb.GapStart++
 
 	lb.Cursor.GoTo(lb.Cursor.X+1, lb.Cursor.Y)
+
 }
 
 func (lb *LineBuffer) GrowBuffer() {
