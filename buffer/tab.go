@@ -36,6 +36,14 @@ func (tb *TabBuffer) InsertRune(r rune) {
 	line.InsertRune(r)
 }
 
+func (tb *TabBuffer) BackDelete() {
+	_, posY := tb.Cursor.GetPos()
+
+	line := tb.Lines[posY]
+
+	line.BackDelete()
+}
+
 func (tb *TabBuffer) InsertString(s string) {
 	// iterate through the string and insert each rune
 	for _, r := range s {
