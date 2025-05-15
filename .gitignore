@@ -1,5 +1,2 @@
 .vscode
-./test.json
-*.txt
-*.json
-*.js
+.txt
